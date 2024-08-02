@@ -82,7 +82,7 @@ void log(Args... args) {
     std::cout << dt << " ";  // Print timestamp to console
 
     // std::string path = fs::current_path().string() + "/log.txt";
-    std::string path = "E:/BaiduNetdiskDownload/hack/code/PE-Shell-Protect/Release/log.txt";
+    std::string path = "PE-Shell-Protect.log";
     // Write to log file
     std::ofstream file(path, std::ios_base::app | std::ios::out);  // 以utf-8编码格式打开文件
     if (file.is_open()) {
@@ -92,11 +92,11 @@ void log(Args... args) {
         file.close();                                                // Close file
     }
 }
-#define CHECK_NOT_NULL(value)                          \
-    do {                                               \
-        if (value == 0) {                              \
-            throw std::runtime_error("value is NULL"); \
-        }                                              \
+#define CHECK_NOT_NULL(value) \
+    do {                      \
+        if (value == 0) {     \
+            return 0;         \
+        }                     \
     } while (0)
 
 
@@ -116,7 +116,7 @@ DWORD MyGetProcAddress(DWORD hModule, LPCSTR funName) {
     for (size_t i = 0; i < exportTable->NumberOfNames; i++) {
         // 获取函数名字
         char* name = (char*)(nameTable[i] + hModule);
-        if (!strcmp(name, funName) == 0) {
+        if (strcmp(name, funName) == 0) {
             return funTable[numberTable[i]] + hModule;
         }
     }
@@ -141,24 +141,17 @@ DWORD GetImportantModule() {
 
 
 BOOL GetFunctions() {
-    DWORD pkernlBase = GetImportantModule();
-    CHECK_NOT_NULL(pkernlBase);
+    DWORD kernlBase = GetImportantModule();
     // 获取LoadlilraryExA
-    g_MyLoadLibraryExA = (MyLoadLibraryExA)MyGetProcAddress(pkernlBase, "LoadLibraryExA");
-    CHECK_NOT_NULL(g_MyLoadLibraryExA);
+    g_MyLoadLibraryExA = (MyLoadLibraryExA)MyGetProcAddress(kernlBase, "LoadLibraryExA");
     // 获取kernel32基址
-    HMODULE kernel32Base = g_MyLoadLibraryExA("kernel32.dll", 0, 0);
-    CHECK_NOT_NULL(kernel32Base);
-    HMODULE user32Base = g_MyLoadLibraryExA("user32.dll", 0, 0);
-    CHECK_NOT_NULL(user32Base);
+    HMODULE kernel32Base = g_MyLoadLibraryExA("Kernel32.dll", 0, 0);
+    HMODULE user32Base = g_MyLoadLibraryExA("User32.dll", 0, 0);
+
     g_MYGetProcAddress = (MYGetProcAddress)MyGetProcAddress((DWORD)kernel32Base, "GetProcAddress");
-    CHECK_NOT_NULL(g_MYGetProcAddress);
     g_MyGetModuleHandleA = (MyGetModuleHandleA)g_MYGetProcAddress(kernel32Base, "GetModuleHandleA");
-    CHECK_NOT_NULL(g_MyGetModuleHandleA);
     g_MyVirtualProtect = (MyVirtualProtect)g_MYGetProcAddress(kernel32Base, "VirtualProtect");
-    CHECK_NOT_NULL(g_MyVirtualProtect);
     g_MyMessageBoxA = (MyMessageBoxA)g_MYGetProcAddress(user32Base, "MessageBoxA");
-    CHECK_NOT_NULL(g_MyMessageBoxA);
     return TRUE;
 }
 

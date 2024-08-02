@@ -1,0 +1,87 @@
+;
+; kernel-thread.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=kernel-thread.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+kernel-thread_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+kernel-thread.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%kernel-thread.DeviceDesc%=kernel-thread_Device, Root\kernel-thread ; TODO: edit hw-id
+
+[kernel-thread_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+kernel-thread.sys
+
+;-------------- Service installation
+[kernel-thread_Device.NT.Services]
+AddService = kernel-thread,%SPSVCINST_ASSOCSERVICE%, kernel-thread_Service_Inst
+
+; -------------- kernel-thread driver install sections
+[kernel-thread_Service_Inst]
+DisplayName    = %kernel-thread.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\kernel-thread.sys
+
+;
+;--- kernel-thread_Device Coinstaller installation ------
+;
+
+[kernel-thread_Device.NT.CoInstallers]
+AddReg=kernel-thread_Device_CoInstaller_AddReg
+CopyFiles=kernel-thread_Device_CoInstaller_CopyFiles
+
+[kernel-thread_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[kernel-thread_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[kernel-thread_Device.NT.Wdf]
+KmdfService =  kernel-thread, kernel-thread_wdfsect
+[kernel-thread_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "kernel-thread Installation Disk"
+kernel-thread.DeviceDesc = "kernel-thread Device"
+kernel-thread.SVCDESC = "kernel-thread Service"

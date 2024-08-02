@@ -1,0 +1,31 @@
+https://blog.csdn.net/weixin_41489908/article/details/130045492
+
+1、虚拟机添加一个串行端口
+
+2、设置命名管道的名字
+\\.\pipe\windbg
+
+3、启动虚拟机
+
+4、添加一个bat文件，以管理员身份运行，内容为
+bcdedit /copy {current} /d "win10 x64 debug for windbg"
+pause
+
+6、通过msconfig打开系统配置--引导
+选择win10 x64 debug for windbg启动系统
+
+7、真机启动windbg
+
+8、中通过菜单选择Kernel Debug或者快捷键ctrl+k
+
+9、重启虚拟机，链接成功
+
+
+
+原文链接：https://blog.csdn.net/daoer_sofu/article/details/130427105
+bcdedit /debug on
+bcdedit /dbgsettings serial debugport:1 baudrate:115200 
+bcdedit /set testsigning on
+bcdedit /set loadoptions DDISABLE_INTEGRITY_CHECKS
+bcdedit /set nointegritychecks on
+                        

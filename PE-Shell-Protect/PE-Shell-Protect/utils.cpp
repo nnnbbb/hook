@@ -8,6 +8,8 @@ Utils::Utils() {
     OptionHeader = NULL;
     FileHeader = NULL;
     FileSize = NULL;
+    ImportTableSize = NULL;
+    NewImportTable = NULL;
 }
 
 
@@ -25,7 +27,7 @@ BOOL Utils::LoadFile(const char* path) {
     printf("status = %d\n", status);
     if (status == FALSE) {
         printf("status = %d\n", status);
-        MessageBoxA(0, "ÎÄ¼þ´ò¿ªÊ§°Ü£¡", "ÌáÊ¾", MB_OK);
+        MessageBoxA(0, "æ–‡ä»¶æ‰“å¼€å¤±è´¥ï¼", "æç¤º", MB_OK);
         return FALSE;
     }
     InitFileInfo();
@@ -44,41 +46,47 @@ BOOL Utils::InitFileInfo() {
 
 
 BOOL Utils::InsertSection(const char* SectionName, DWORD CodeSize, char* CodeBuff, DWORD Characteristics) {
-    // »ñÈ¡¶ÔÆëºóµÄPEÎÄ¼þ´óÐ¡
+    CodeSize += ImportTableSize;
+    // èŽ·å–å¯¹é½åŽçš„PEæ–‡ä»¶å¤§å°
     DWORD NewFileSize = GetAlignSize(FileSize + CodeSize, OptionHeader->FileAlignment);
-    // ´´½¨ÐÂµÄ»º³åÇø´æ·ÅPEÎÄ¼þ
+    // åˆ›å»ºæ–°çš„ç¼“å†²åŒºå­˜æ”¾PEæ–‡ä»¶
     char* NewFileBuff = new char[NewFileSize]{};
     memcpy_s(NewFileBuff, NewFileSize, FileBuff, FileSize);
     FileSize = NewFileSize;
     delete[] FileBuff;
     FileBuff = NewFileBuff;
     InitFileInfo();
-    // ¸øÐÂÔöµÄÇø¶ÎÌí¼ÓÇø¶ÎÍ·
+    // ç»™æ–°å¢žçš„åŒºæ®µæ·»åŠ åŒºæ®µå¤´
     PIMAGE_SECTION_HEADER PlastSectionHeader = GetLastSection();
 
     PlastSectionHeader++;
-    // ¸øÐÂÇø¶ÎÍ·ÉèÖÃÊôÐÔ
-    // ÉèÖÃÄÚ´æ´óÐ¡
+    // ç»™æ–°åŒºæ®µå¤´è®¾ç½®å±žæ€§
+    // è®¾ç½®å†…å­˜å¤§å°
     PlastSectionHeader->Misc.VirtualSize = GetAlignSize(CodeSize, OptionHeader->SectionAlignment);
-    // ÉèÖÃÇø¶ÎÃû³Æ
+    // è®¾ç½®åŒºæ®µåç§°
     strcpy_s((char*)PlastSectionHeader->Name, 8, SectionName);
-    // ÎÄ¼þ´óÐ¡
+    // æ–‡ä»¶å¤§å°
     PlastSectionHeader->SizeOfRawData = GetAlignSize(CodeSize, OptionHeader->FileAlignment);
-    // ÉèÖÃvirtualAddress
+    // è®¾ç½®virtualAddress
     PIMAGE_SECTION_HEADER plastSectionHeader2 = GetLastSection();
     PlastSectionHeader->VirtualAddress = plastSectionHeader2->VirtualAddress +
                                          GetAlignSize(plastSectionHeader2->Misc.VirtualSize, OptionHeader->SectionAlignment);
 
     PlastSectionHeader->PointerToRawData = plastSectionHeader2->PointerToRawData + plastSectionHeader2->SizeOfRawData;
     PlastSectionHeader->Characteristics = Characteristics;
-    // ÐÞ¸ÄnumberOfSections
+    // ä¿®æ”¹numberOfSections
     FileHeader->NumberOfSections++;
     // size0fImage
     OptionHeader->SizeOfImage += GetAlignSize(CodeSize, OptionHeader->SectionAlignment);
 
-    // ½«ÎÒÃÇµÄ¿Ç´úÂë·Åµ½ÐÂµÄÇø¶Î
+    // å°†æˆ‘ä»¬çš„å£³ä»£ç æ”¾åˆ°æ–°çš„åŒºæ®µ
     char* SectionAddr = GetLastSection()->PointerToRawData + FileBuff;
     memcpy(SectionAddr, CodeBuff, CodeSize);
+
+    // ç§»åŠ¨å¯¼å…¥è¡¨
+    SectionAddr += CodeSize;
+    memcpy(SectionAddr, NewImportTable, ImportTableSize);
+    OptionHeader->DataDirectory[1].VirtualAddress = FoaToRva(SectionAddr - FileBuff);
     return TRUE;
 }
 
@@ -103,7 +111,7 @@ BOOL Utils::SaveFile(const char* Path) {
     DWORD realWrite = 0;
     BOOL success = WriteFile(handle, FileBuff, FileSize, &realWrite, NULL);
     if (success == FALSE) {
-        MessageBoxA(0, "ÎÄ¼þÐ´ÈëÊ§°Ü£¡", "ÌáÊ¾", MB_OK);
+        MessageBoxA(0, "æ–‡ä»¶å†™å…¥å¤±è´¥ï¼", "æç¤º", MB_OK);
         return FALSE;
     }
     CloseHandle(handle);
@@ -122,7 +130,7 @@ BOOL Utils::EncodeSections() {
     return TRUE;
 }
 
-DWORD Utils::GetJmp0ldVA() {
+DWORD Utils::GetJmpOldVA() {
     DWORD jmpVA = OptionHeader->AddressOfEntryPoint + OptionHeader->ImageBase;
     return jmpVA;
 }
@@ -132,13 +140,13 @@ BOOL Utils::SetNewOep(DWORD OepRva) {
     return TRUE;
 }
 
-// ÐÞ¸´ÖØ¶¨Î»±í
-BOOL Utils::FixRelocation(DWORD ImageBase) {
+// ä¿®å¤é‡å®šä½è¡¨
+BOOL Utils::FixDllRelocation(DWORD ImageBase) {
     PIMAGE_DOS_HEADER DllDosHeader = (PIMAGE_DOS_HEADER)ImageBase;
     PIMAGE_NT_HEADERS DllNtHeader = (PIMAGE_NT_HEADERS)(DllDosHeader->e_lfanew + ImageBase);
     PIMAGE_OPTIONAL_HEADER DllOptionHeader = &DllNtHeader->OptionalHeader;
-    IMAGE_DATA_DIRECTORY dataDirctory = DllOptionHeader->DataDirectory[5];
-    PIMAGE_BASE_RELOCATION DllRelocation = (PIMAGE_BASE_RELOCATION)(dataDirctory.VirtualAddress + ImageBase);
+    IMAGE_DATA_DIRECTORY DataDirctory = DllOptionHeader->DataDirectory[5];
+    PIMAGE_BASE_RELOCATION DllRelocation = (PIMAGE_BASE_RELOCATION)(DataDirctory.VirtualAddress + ImageBase);
     PIMAGE_SECTION_HEADER DllFistSectionHeader = IMAGE_FIRST_SECTION(DllNtHeader);
 
     DWORD OldProtect;
@@ -150,20 +158,20 @@ BOOL Utils::FixRelocation(DWORD ImageBase) {
         char* BeginAddr = (char*)DllRelocation;
         BeginAddr += 8;
         for (size_t i = 0; i < Number; i++) {
-            WORD* prelocRva = (WORD*)BeginAddr;
+            WORD* PrelocRva = (WORD*)BeginAddr;
 
-            if ((*prelocRva & 0X3000) == 0X3000) {
-                // È¡wordÇ°12Î»+´óÆ«ÒÆ=rva;
-                WORD RepairRva = (*prelocRva & 0x0FFF) + DllRelocation->VirtualAddress;
-                // »ñÈ¡ÐèÒªÖØ¶¨Î»±äÁ¿µÄµØÖ·
+            if ((*PrelocRva & 0X3000) == 0X3000) {
+                // å–wordå‰12ä½+å¤§åç§»=rva;
+                WORD RepairRva = (*PrelocRva & 0x0FFF) + DllRelocation->VirtualAddress;
+                // èŽ·å–éœ€è¦é‡å®šä½å˜é‡çš„åœ°å€
                 DWORD* RelRepairAddr = (DWORD*)(ImageBase + RepairRva);
 
-                // »ñÈ¡ÐÂÌí¼ÓÇø¶ÎµÄÆðÊ¼µØÖ·
+                // èŽ·å–æ–°æ·»åŠ åŒºæ®µçš„èµ·å§‹åœ°å€
                 PIMAGE_SECTION_HEADER LastSection = GetLastSection();
                 DWORD NewFileSection = (DWORD)(LastSection->PointerToRawData + FileBuff);
                 DWORD NewSectionAddr = LastSection->VirtualAddress + OptionHeader->ImageBase;
 
-                // »ñÈ¡±äÁ¿ÔÚÐÂÌí¼ÓµÄÇø¶ÎÖÐµÄµØÖ·fileBuffÖÐµÄµØÖ·
+                // èŽ·å–å˜é‡åœ¨æ–°æ·»åŠ çš„åŒºæ®µä¸­çš„åœ°å€fileBuffä¸­çš„åœ°å€
                 DWORD DestAddr = (DWORD)RelRepairAddr - (DllFistSectionHeader->VirtualAddress + ImageBase) + NewFileSection;
 
                 *(DWORD*)DestAddr = (*(DWORD*)DestAddr - ImageBase) - DllFistSectionHeader->VirtualAddress + NewSectionAddr;
@@ -176,4 +184,57 @@ BOOL Utils::FixRelocation(DWORD ImageBase) {
 }
 
 
+BOOL Utils::GetImportTable() {
+    char* Offset = RvaToFoa(OptionHeader->DataDirectory[1].VirtualAddress) + FileBuff;
+    PIMAGE_IMPORT_DESCRIPTOR ImportTable = (PIMAGE_IMPORT_DESCRIPTOR)(Offset);
+    PIMAGE_IMPORT_DESCRIPTOR FitstTable = (PIMAGE_IMPORT_DESCRIPTOR)(Offset);
+    size_t TableLen = 0;
+    while (ImportTable->Name != NULL) {
+        TableLen++;
+        ImportTable++;
+    }
+    if (TableLen == 0) {
+        return TRUE;
+    }
+    TableLen++;
+    size_t ImportDescriptorSize = sizeof(IMAGE_IMPORT_DESCRIPTOR);
+    ImportTableSize = ImportDescriptorSize * TableLen;
+    NewImportTable = new IMAGE_IMPORT_DESCRIPTOR[TableLen]{};
+    memcpy(NewImportTable, FitstTable, (ImportDescriptorSize * (TableLen - 1)));
+    return TRUE;
+}
 
+
+DWORD Utils::RvaToFoa(DWORD Rva) {
+    DWORD Foa = 0;
+    PIMAGE_SECTION_HEADER SectionHeader = IMAGE_FIRST_SECTION(NtHeader);
+    while (SectionHeader->Name != NULL) {
+        // åˆ¤æ–­å½“å‰åœ°å€å±žäºŽå“ªä¸ªåŒºæ®µ
+        if (Rva >= SectionHeader->VirtualAddress &&
+            Rva < (SectionHeader->VirtualAddress + SectionHeader->Misc.VirtualSize)) {
+            Foa = Rva - SectionHeader->VirtualAddress + SectionHeader->PointerToRawData;
+            break;
+        }
+        SectionHeader++;
+    }
+
+    return Foa;
+}
+
+
+DWORD Utils::FoaToRva(DWORD Foa) {
+    DWORD Rva = 0;
+    PIMAGE_SECTION_HEADER SectionHeader = IMAGE_FIRST_SECTION(NtHeader);
+    while (SectionHeader->Name != NULL) {
+        // åˆ¤æ–­å½“å‰åœ°å€å±žäºŽå“ªä¸ªåŒºæ®µ
+        if (Foa >= SectionHeader->PointerToRawData &&
+            Foa < (SectionHeader->PointerToRawData + SectionHeader->SizeOfRawData)) {
+
+            Rva = Foa + SectionHeader->VirtualAddress - SectionHeader->PointerToRawData;
+            break;
+        }
+        SectionHeader++;
+    }
+
+    return Rva;
+}

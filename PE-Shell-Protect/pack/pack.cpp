@@ -12,7 +12,7 @@
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
 
-// ½«´úÂë¶ÎÊı¾İ¶ÎºÏ²¢µ½Ò»Æğ
+// å°†ä»£ç æ®µæ•°æ®æ®µåˆå¹¶åˆ°ä¸€èµ·
 #pragma comment(linker, "/merge:.data=.text")
 #pragma comment(linker, "/merge:.rdata=.text")
 #pragma comment(linker, "/section:.text,RWE")
@@ -84,7 +84,7 @@ void log(Args... args) {
     // std::string path = fs::current_path().string() + "/log.txt";
     std::string path = "PE-Shell-Protect.log";
     // Write to log file
-    std::ofstream file(path, std::ios_base::app | std::ios::out);  // ÒÔutf-8±àÂë¸ñÊ½´ò¿ªÎÄ¼ş
+    std::ofstream file(path, std::ios_base::app | std::ios::out);  // ä»¥utf-8ç¼–ç æ ¼å¼æ‰“å¼€æ–‡ä»¶
     if (file.is_open()) {
         file << dt << " ";                                           // Write timestamp
         int _[] = {0, ((_print(args), file << args << " "), 0)...};  // Expand args
@@ -102,19 +102,19 @@ void log(Args... args) {
 
 DWORD MyGetProcAddress(DWORD hModule, LPCSTR funName) {
 
-    // »ñÈ¡DOSÍ·NtÍ·
+    // è·å–DOSå¤´Ntå¤´
     PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)hModule;
     PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)(pDosHeader->e_lfanew + hModule);
-    // »ñÈ¡µ¼³ö±í
+    // è·å–å¯¼å‡ºè¡¨
     DWORD exportTableRVa = pNtHeader->OptionalHeader.DataDirectory[0].VirtualAddress;
     PIMAGE_EXPORT_DIRECTORY exportTable = (PIMAGE_EXPORT_DIRECTORY)(exportTableRVa + hModule);
 
-    // ÕÒµ½µ¼³öÃû³Æ±í£¬ĞòºÅ±í£¬µØÖ·±í
+    // æ‰¾åˆ°å¯¼å‡ºåç§°è¡¨ï¼Œåºå·è¡¨ï¼Œåœ°å€è¡¨
     DWORD* nameTable = (DWORD*)(exportTable->AddressOfNames + hModule);
     DWORD* funTable = (DWORD*)(exportTable->AddressOfFunctions + hModule);
     WORD* numberTable = (WORD*)(exportTable->AddressOfNameOrdinals + hModule);
     for (size_t i = 0; i < exportTable->NumberOfNames; i++) {
-        // »ñÈ¡º¯ÊıÃû×Ö
+        // è·å–å‡½æ•°åå­—
         char* name = (char*)(nameTable[i] + hModule);
         if (strcmp(name, funName) == 0) {
             return funTable[numberTable[i]] + hModule;
@@ -124,7 +124,7 @@ DWORD MyGetProcAddress(DWORD hModule, LPCSTR funName) {
 }
 
 
-// »ñÈ¡ kernel32 »òÕß kernelbase.dll »ùÖ·
+// è·å– kernel32 æˆ–è€… kernelbase.dll åŸºå€
 DWORD GetImportantModule() {
 
     DWORD dwBase = 0;
@@ -142,9 +142,9 @@ DWORD GetImportantModule() {
 
 BOOL GetFunctions() {
     DWORD kernlBase = GetImportantModule();
-    // »ñÈ¡LoadlilraryExA
+    // è·å–LoadlilraryExA
     g_MyLoadLibraryExA = (MyLoadLibraryExA)MyGetProcAddress(kernlBase, "LoadLibraryExA");
-    // »ñÈ¡kernel32»ùÖ·
+    // è·å–kernel32åŸºå€
     HMODULE kernel32Base = g_MyLoadLibraryExA("Kernel32.dll", 0, 0);
     HMODULE user32Base = g_MyLoadLibraryExA("User32.dll", 0, 0);
 
@@ -180,7 +180,7 @@ _declspec(naked) void packStart() {
     GetImportantModule();
     GetFunctions();
     DecodeSections();
-    g_MyMessageBoxA(0, "¿Ç´úÂëÖ´ĞĞ", "ÌáÊ¾", MB_OK);
+    g_MyMessageBoxA(0, "å£³ä»£ç æ‰§è¡Œ", "æç¤º", MB_OK);
     _asm popad;
     _asm jmp g_PackInfo.oldOEP;
 }

@@ -10,6 +10,8 @@ class Utils {
     PIMAGE_NT_HEADERS NtHeader;
     PIMAGE_OPTIONAL_HEADER OptionHeader;
     PIMAGE_FILE_HEADER FileHeader;
+    DWORD ImportTableSize;
+    PIMAGE_IMPORT_DESCRIPTOR NewImportTable;
 
    public:
     Utils();
@@ -28,7 +30,10 @@ class Utils {
     PIMAGE_SECTION_HEADER GetLastSection();
     BOOL SaveFile(const char* path);
     BOOL EncodeSections();
-    DWORD GetJmp0ldVA();
+    DWORD GetJmpOldVA();
     BOOL SetNewOep(DWORD oepRva);
-    BOOL FixRelocation(DWORD imageBase);
+    BOOL FixDllRelocation(DWORD imageBase);
+    BOOL GetImportTable();
+    DWORD RvaToFoa(DWORD Rva);
+    DWORD FoaToRva(DWORD Foa);
 };

@@ -25,6 +25,7 @@ int main() {
     char* sectionBuff = (char*)(dllFirstSectionHeader->VirtualAddress + (DWORD)PackModule);
 
     utils.GetImportTable();
+    DWORD DllSize = utils.GetAllSectionsSize((DWORD)PackModule);
     utils.InsertSection("51hook", dllFirstSectionHeader->Misc.VirtualSize, sectionBuff, 0xE00000E0);
     utils.FixDllRelocation((DWORD)PackModule);
 

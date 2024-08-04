@@ -32,8 +32,9 @@ class Utils {
     BOOL EncodeSections();
     DWORD GetJmpOldVA();
     BOOL SetNewOep(DWORD oepRva);
-    BOOL FixDllRelocation(DWORD imageBase);
+    BOOL FixDllRelocation(DWORD ImageBase);
     BOOL GetImportTable();
     DWORD RvaToFoa(DWORD Rva);
     DWORD FoaToRva(DWORD Foa);
+    DWORD GetAllSectionsSize(DWORD ImageBase);
 };

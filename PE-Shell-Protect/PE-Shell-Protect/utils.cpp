@@ -149,8 +149,6 @@ BOOL Utils::FixDllRelocation(DWORD ImageBase) {
     PIMAGE_BASE_RELOCATION DllRelocation = (PIMAGE_BASE_RELOCATION)(DataDirctory.VirtualAddress + ImageBase);
     PIMAGE_SECTION_HEADER DllFistSectionHeader = IMAGE_FIRST_SECTION(DllNtHeader);
 
-    DWORD OldProtect;
-
     while (DllRelocation->SizeOfBlock != 0) {
         // DWORD Number = (DllRelocation->SizeOfBlock - 8) / 2;
         DWORD Number = (DllRelocation->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / 2;
@@ -237,4 +235,12 @@ DWORD Utils::FoaToRva(DWORD Foa) {
     }
 
     return Rva;
+}
+
+DWORD Utils::GetAllSectionsSize(DWORD ImageBase) {
+    PIMAGE_DOS_HEADER DllDosHeader = (PIMAGE_DOS_HEADER)ImageBase;
+    PIMAGE_NT_HEADERS DllNtHeader = (PIMAGE_NT_HEADERS)(DllDosHeader->e_lfanew + ImageBase);
+    PIMAGE_SECTION_HEADER pFisrtHeader = IMAGE_FIRST_SECTION(DllNtHeader);
+    int Size = DllNtHeader->OptionalHeader.SizeOfImage - pFisrtHeader->VirtualAddress;
+    return Size;
 }

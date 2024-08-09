@@ -304,6 +304,78 @@ enum VMCSFIELDS {
 };
 
 
+// https://blog.csdn.net/weixin_46324627/article/details/136325212
+// https://www.virtualbox.org/svn/vbox/trunk/src/VBox/VMM/VMMAll/HMAll.cpp
+enum VMX_EXIT_REASON {
+    VMX_EXIT_XCPT_OR_NMI = 0,
+    VMX_EXIT_EXT_INT = 1,
+    VMX_EXIT_TRIPLE_FAULT = 2,
+    VMX_EXIT_INIT_SIGNAL = 3,
+    VMX_EXIT_SIPI = 4,
+    VMX_EXIT_IO_SMI_IRQ = 5,
+    VMX_EXIT_SMI_IRQ = 6,
+    VMX_EXIT_INT_WINDOW = 7,
+    VMX_EXIT_NMI_WINDOW = 8,
+    VMX_EXIT_TASK_SWITCH = 9,
+    VMX_EXIT_CPUID = 10,
+    VMX_EXIT_GETSEC = 11,
+    VMX_EXIT_HLT = 12,
+    VMX_EXIT_INVD = 13,
+    VMX_EXIT_INVLPG = 14,
+    VMX_EXIT_RDPMC = 15,
+    VMX_EXIT_RDTSC = 16,
+    VMX_EXIT_RSM = 17,
+    VMX_EXIT_VMCALL = 18,
+    VMX_EXIT_VMCLEAR = 19,
+    VMX_EXIT_VMLAUNCH = 20,
+    VMX_EXIT_VMPTRLD = 21,
+    VMX_EXIT_VMPTRST = 22,
+    VMX_EXIT_VMREAD = 23,
+    VMX_EXIT_VMRESUME = 24,
+    VMX_EXIT_VMWRITE = 25,
+    VMX_EXIT_VMXOFF = 26,
+    VMX_EXIT_VMXON = 27,
+    VMX_EXIT_MOV_CRX = 28,
+    VMX_EXIT_MOV_DRX = 29,
+    VMX_EXIT_PORT_IO = 30,
+    VMX_EXIT_RDMSR = 31,
+    VMX_EXIT_WRMSR = 32,
+    VMX_EXIT_ERR_INVALID_GUEST_STATE = 33,
+    VMX_EXIT_ERR_MSR_LOAD = 34,
+    VMX_EXIT_MWAIT = 36,
+    VMX_EXIT_MTF = 37,
+    VMX_EXIT_MONITOR = 39,
+    VMX_EXIT_PAUSE = 40,
+    VMX_EXIT_ERR_MACHINE_CHECK = 41,
+    VMX_EXIT_TPR_BELOW_THRESHOLD = 43,
+    VMX_EXIT_APIC_ACCESS = 44,
+    VMX_EXIT_VIRTUALIZED_EOI = 45,
+    VMX_EXIT_GDTR_IDTR_ACCESS = 46,
+    VMX_EXIT_LDTR_TR_ACCESS = 47,
+    VMX_EXIT_EPT_VIOLATION = 48,
+    VMX_EXIT_EPT_MISCONFIG = 49,
+    VMX_EXIT_INVEPT = 50,
+    VMX_EXIT_RDTSCP = 51,
+    VMX_EXIT_PREEMPT_TIMER = 52,
+    VMX_EXIT_INVVPID = 53,
+    VMX_EXIT_WBINVD = 54,
+    VMX_EXIT_XSETBV = 55,
+    VMX_EXIT_APIC_WRITE = 56,
+    VMX_EXIT_RDRAND = 57,
+    VMX_EXIT_INVPCID = 58,
+    VMX_EXIT_VMFUNC = 59,
+    VMX_EXIT_ENCLS = 60,
+    VMX_EXIT_RDSEED = 61,
+    VMX_EXIT_PML_FULL = 62,
+    VMX_EXIT_XSAVES = 63,
+    VMX_EXIT_XRSTORS = 64,
+    VMX_EXIT_SPP_EVENT = 66,
+    VMX_EXIT_UMWAIT = 67,
+    VMX_EXIT_TPAUSE = 68,
+    VMX_EXIT_BUS_LOCK = 74,
+};
+
+
 #define DPL_USER             3
 #define DPL_SYSTEM           0
 #define MSR_GS_BASE          0xC0000101
@@ -419,9 +491,7 @@ enum VMCSFIELDS {
 
 
 
-#define CPUID_1_ECX_VMX   (1 << 5)
-#define ROUNDUP(x, align) ((x + align - 1) & ~(align - 1))
-
+#define CPUID_1_ECX_VMX (1 << 5)
 
 #define PML4E_ENTRY_COUNT 512
 #define PDPTE_ENTRY_COUNT 512
@@ -649,6 +719,32 @@ typedef struct _VMX_EPT {
 
 void print(const char* format, ...);
 
+#define ROUNDUP(x, align) ((x + align - 1) & ~(align - 1))
+#define LODWORD(qword)    (((ULONGLONG)(qword)) & 0xFFFFFFFF)
+#define HIDWORD(qword)    ((((ULONGLONG)(qword)) >> 32) & 0xFFFFFFFF)
+
+#ifndef MAKEQWORD
+#define MAKEQWORD(lo, hi) ((((ULONGLONG)lo) & 0xFFFFFFFF) | ((((ULONGLONG)hi) & 0xFFFFFFFF) << 32))
+#endif
+
+#define R_RAX 0
+#define R_RCX 1
+#define R_RDX 2
+#define R_RBX 3
+#define R_RSP 4
+#define R_RBP 5
+#define R_RSI 6
+#define R_RDI 7
+#define R_R8  8
+#define R_R9  9
+#define R_R10 10
+#define R_R11 11
+#define R_R12 12
+#define R_R13 13
+#define R_R14 14
+#define R_R15 15
+#define R_MAX 16
+
 class SimpleVT {
    public:
     SimpleVT(ULONG uCPU) : m_CPU(uCPU),
@@ -671,7 +767,7 @@ class SimpleVT {
     BOOLEAN CheakVTSupported();
     BOOLEAN CheakVTEnable();
     VOID GdtEntryToVmcsFormat(ULONG selector, ULONG_PTR* base, ULONG_PTR* limit, ULONG_PTR* rights);
-    BOOLEAN InitVMCS();
+    VOID InitVMCS();
 
     VOID InitializeEPT();
 

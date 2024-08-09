@@ -1,22 +1,53 @@
 #include "SimpleVT.h"
 #include "Asm.h"
 
+
+// #define ENABLE_EPT
+
+#define VMERR_RET(x, s)                        \
+    if (x != 0) {                              \
+        print("VMERR_RET %s 调用【失败】", s); \
+        return;                                \
+    }
+
+
+#define VMWRITE_ERR_RET(e, v)                \
+    print("VM Write %s: 0x%016llX ", #e, v); \
+    VMERR_RET(vmxwrite(e, v), "vmwrite - " #e);
+
+#define VMREAD_ERR_RET(e, v)                \
+    print("VM Read %s: 0x%016llX ", #e, v); \
+    VMERR_RET(vmxread(e, v), "vmxread - " #e);
+
+
+// void print(const char* format, ...) {
+//     const char prefix[] = "[Debug]:";
+//     char message[1024];
+//
+//     size_t prefix_len = strlen(prefix);
+//     size_t message_size = sizeof(message);
+//
+//     strncpy(message, prefix, message_size);
+//
+//     va_list vl;
+//     va_start(vl, format);
+//     const int n = _vsnprintf(message + prefix_len, message_size - prefix_len, format, vl);
+//     va_end(vl);
+//
+//     strncat(message, "\r\n", message_size - strlen(message) - 1);  // 确保不会越界
+//
+//     DbgPrint(message);
+// }
+
 void print(const char* format, ...) {
-    const char prefix[] = "[Debug]:";
-    char message[1024];
-
-    size_t prefix_len = strlen(prefix);
-    size_t message_size = sizeof(message);
-
-    strncpy(message, prefix, message_size);
-
+    char message[1024] = "";
     va_list vl;
     va_start(vl, format);
-    const int n = _vsnprintf(message + prefix_len, message_size - prefix_len, format, vl);
+    const int n = _vsnprintf(message, sizeof(message) / sizeof(char), format, vl);
+    message[n] = '\0';
     va_end(vl);
 
-    strncat(message, "\r\n", message_size - strlen(message) - 1);  // 确保不会越界
-
+    va_end(format);
     DbgPrint(message);
 }
 
@@ -41,29 +72,198 @@ __forceinline unsigned char vmxwrite(VMCSFIELDS Encodeing, ULONG_PTR Value) {
     return __vmx_vmwrite(Encodeing, Value);
 }
 
+__forceinline unsigned char vmxread(VMCSFIELDS Encodeing, ULONG_PTR* Value) {
+    return __vmx_vmread(Encodeing, Value);
+}
+
+__forceinline unsigned char vmxlaunch() {
+    return __vmx_vmlaunch();
+}
+
 __forceinline ULONG_PTR VmxAdjustMsr(ULONG_PTR MsrValue, ULONG_PTR DesiredValue) {
     DesiredValue &= (MsrValue >> 32);
     DesiredValue |= (MsrValue & 0xFFFFFFFF);
     return DesiredValue;
 }
-#define ENABLE_EPT
 
-#define VMERR_RET(x, s)            \
-    if (x != 0) {                  \
-        print("VMERR_RET %s ", s); \
-        return FALSE;              \
+void ShowGuestRegister(ULONG_PTR* Registers) {
+    ULONG_PTR Rip = 0, Rsp = 0;
+    ULONG_PTR Cr0 = 0, Cr3 = 0, Cr4 = 0;
+    ULONG_PTR Cs = 0, Ss = 0, Ds = 0, Es = 0, Fs = 0, Gs = 0, Tr = 0, Ldtr = 0;
+    ULONG_PTR GsBase = 0, DebugCtl = 0, Dr7 = 0, RFlags = 0;
+    ULONG_PTR IdtBase = 0, GdtBase = 0, IdtLimit = 0, GdtLimit = 0;
+    print(
+        "RAX = 0x%01611X RCX = 0x%01611X RDX = 0x%01611X RBX = 0x%01611X",
+        Registers[R_RAX],
+        Registers[R_RCX],
+        Registers[R_RDX],
+        Registers[R_RBX]
+    );
+    print(
+        "RSP = 0x%01611X RBP = 0x%01611X RSI = 0x%01611X RDI = 0x%01611X",
+        Registers[R_RSP],
+        Registers[R_RBP],
+        Registers[R_RSI],
+        Registers[R_RDI]
+    );
+    print(
+        "R8 = 0x%01611X R9 = 0x%01611X R10 = 0x%01611X R11 = 0x%01611X",
+        Registers[R_R8],
+        Registers[R_R9],
+        Registers[R_R10],
+        Registers[R_R11]
+    );
+    print(
+        "R12 = 0x%01611X R13 = 0x%01611X R14 = 0x%01611X R15 = 0x%01611X",
+        Registers[R_R12],
+        Registers[R_R13],
+        Registers[R_R14],
+        Registers[R_R15]
+    );
+    __vmx_vmread(GUEST_RSP, &Rsp);
+    __vmx_vmread(GUEST_RIP, &Rip);
+    print("RSP = 0x%01611X RIP = 0x%01611X\n", Rsp, Rip);
+
+    __vmx_vmread(GUEST_CR0, &Cr0);
+    __vmx_vmread(GUEST_CR3, &Cr3);
+    __vmx_vmread(GUEST_CR4, &Cr4);
+    print("Debug:CR0 = 0x%01611X CR3= 0x%01611X CR4 = 0x%01611X\n", Cr0, Cr3, Cr4);
+
+    __vmx_vmread(GUEST_CS_SELECTOR, &Cs);
+    __vmx_vmread(GUEST_DS_SELECTOR, &Ds);
+    __vmx_vmread(GUEST_ES_SELECTOR, &Es);
+    __vmx_vmread(GUEST_FS_SELECTOR, &Fs);
+    __vmx_vmread(GUEST_GS_SELECTOR, &Gs);
+    __vmx_vmread(GUEST_TR_SELECTOR, &Tr);
+    __vmx_vmread(GUEST_LDTR_SELECTOR, &Ldtr);
+    print(
+        "CS= 0x%01611X DS= 0x%01611X ES= 0x%01611X FS= 0x%01611X GS= 0x%01611X TR= 0x%01611X LDTR = 0x%01611X",
+        Cs,
+        Ds,
+        Es,
+        Fs,
+        Gs,
+        Tr,
+        Ldtr
+    );
+
+    __vmx_vmread(GUEST_GS_BASE, &GsBase);
+    __vmx_vmread(GUEST_IA32_DEBUGCTL, &DebugCtl);
+    __vmx_vmread(GUEST_DR7, &Dr7);
+    __vmx_vmread(GUEST_RFLAGS, &RFlags);
+    print(
+        "GsBase = 0x%01611X DebugCtl = 0x%01611X Dr7 = 0x%01611X RF1ags = 0x%01611X",
+        GsBase,
+        DebugCtl,
+        Dr7,
+        RFlags
+    );
+    __vmx_vmread(GUEST_IDTR_BASE, &IdtBase);
+    __vmx_vmread(GUEST_IDTR_LIMIT, &IdtLimit);
+    print(" IdtBase = 0x%016llX IdtLimit = 0x%01611X", IdtBase, IdtLimit);
+
+    __vmx_vmread(GUEST_GDTR_BASE, &GdtBase);
+    __vmx_vmread(GUEST_GDTR_LIMIT, &GdtLimit);
+    print("GdtBase = 0x%016llX GdtLimit = 0x%0161lX", GdtBase, GdtLimit);
+
+    return VOID();
+}
+
+EXTERN_C VOID VMExitHandler(ULONG_PTR* Registers) {
+    // ShowGuestRegister(Registers);
+    ULONG_PTR GuestRIP = 0;
+    ULONG_PTR GuestRSP = 0;
+    ULONG_PTR ExitInstruetionLength = 0;
+    ULONG_PTR ExitReason = 0;
+    ULONG_PTR GuestRFLAGS = 0;
+    ULONGLONG MsrValue = 0;
+    ULONG_PTR ExitQualification = 0;
+    ULONG_PTR numCR = 0, opType = 0, accType = 0, reg = 0, cr3 = 0;
+    int CPUInfo[4] = {};
+
+    VMREAD_ERR_RET(GUEST_RIP, &GuestRIP);
+    VMREAD_ERR_RET(VM_EXIT_INSTRUCTION_LEN, &ExitInstruetionLength);
+    VMREAD_ERR_RET(VM_EXIT_REASON, &ExitReason);
+    VMREAD_ERR_RET(GUEST_RFLAGS, &GuestRFLAGS);
+    VMREAD_ERR_RET(EXIT_QUALIFICATION, &ExitQualification);
+
+    switch (ExitReason) {
+        case VMX_EXIT_CPUID:
+            if (Registers[R_RAX] == 0x88888888) {
+                ShowGuestRegister(Registers);
+                Registers[R_RBX] = 0x66666666;
+                Registers[R_RCX] = 0x33333333;
+                Registers[R_RDX] = 0x22222222;
+            } else {
+                __cpuidex(CPUInfo, Registers[R_RAX], Registers[R_RCX]);
+                Registers[R_RAX] = (ULONG_PTR)CPUInfo[0];
+                Registers[R_RBX] = (ULONG_PTR)CPUInfo[1];
+                Registers[R_RCX] = (ULONG_PTR)CPUInfo[2];
+                Registers[R_RDX] = (ULONG_PTR)CPUInfo[3];
+            }
+            break;
+        case VMX_EXIT_VMCALL: {
+            ULONG64 JmpEIP;
+            if (Registers[R_RAX] == 'BYE') {
+                print("【VMCALL被调用】");
+                JmpEIP = GuestRIP + ExitInstruetionLength;
+                __vmx_off();
+                Asm_AfterVMXOff(GuestRSP, JmpEIP);
+            }
+        } break;
+        case VMX_EXIT_VMCLEAR:  // 拒绝嵌套VM指令的运行
+        case VMX_EXIT_VMLAUNCH:
+        case VMX_EXIT_VMPTRLD:
+        case VMX_EXIT_VMPTRST:
+        case VMX_EXIT_VMREAD:
+        case VMX_EXIT_VMWRITE:
+        case VMX_EXIT_VMRESUME:
+        case VMX_EXIT_VMXON:
+        case VMX_EXIT_VMXOFF:
+            VMWRITE_ERR_RET(GUEST_RFLAGS, GuestRFLAGS | 0x1);
+            break;
+        case VMX_EXIT_RDMSR:
+            MsrValue = __readmsr(Registers[R_RCX]);
+            Registers[R_RAX] = LODWORD(MsrValue);
+            Registers[R_RDX] = HIDWORD(MsrValue);
+            break;
+        case VMX_EXIT_WRMSR:
+            MsrValue = MAKEQWORD(Registers[R_RAX], Registers[R_RDX]);
+            __writemsr(Registers[R_RCX], MsrValue);
+            break;
+        case VMX_EXIT_MOV_CRX:
+            numCR = ExitQualification & 0b1111;
+            opType = (ExitQualification >> 6) & 1;
+            accType = (ExitQualification & 0b110000) >> 4;
+            reg = (ExitQualification >> 8) & 0b1111;
+            if (numCR == 3 && opType == 0) {
+                if (accType == 1) {  // mov reg,cr3
+                    VMREAD_ERR_RET(GUEST_CR3, &cr3);
+                    Registers[reg] = cr3;
+                } else if (accType == 0) {  // mov cr3,reg
+                    cr3 = Registers[reg];
+                    VMWRITE_ERR_RET(GUEST_CR3, cr3);
+                }
+            }
+            break;
+        case VMX_EXIT_XSETBV:
+            _xsetbv(Registers[R_RCX], MAKEQWORD(Registers[R_RAX], Registers[R_RDX]));
+            break;
+        case VMX_EXIT_INVD:
+            __wbinvd();
+            break;
+        case VMX_EXIT_XCPT_OR_NMI:
+            break;
+        default:
+            print("未知的 VM_EIXT 原因：0x%x", ExitReason);
+            break;
     }
 
+    __vmx_vmwrite(GUEST_RIP, GuestRIP + ExitInstruetionLength);
 
-#define VMWRITE_ERR_RET(e, v)               \
-    print("VMWRITE %s: 0x%016llX ", #e, v); \
-    VMERR_RET(vmxwrite(e, v), "vmwrite - " #e);
-
-
-EXTERN_C BOOLEAN VMExitHandler(ULONG_PTR* Registers) {
-    UNREFERENCED_PARAMETER(Registers);
-    return TRUE;
+    return VOID();
 }
+
 
 BOOLEAN SimpleVT::Initialize() {
     if (!CheakVTSupported()) {
@@ -89,20 +289,26 @@ BOOLEAN SimpleVT::Initialize() {
     }
 
     m_VMXRootStackRegion = (ULONG_PTR)MmAllocateNonCachedMemory(3 * PAGE_SIZE);
-
     if (m_VMXRootStackRegion) {
-        SetVMExitHandler((ULONG_PTR)VMExitHandler, m_VMXRootStackRegion + 0x2000);
+        SetVMExitHandler((ULONG_PTR)Asm_VMExitHandler, m_VMXRootStackRegion + 0x2000);
     }
 
     m_VMXOn = FALSE;
 
     InitVMCS();
 
+    __writeds(0x28 | 0x3);
+    __writees(0x28 | 0x3);
+    __writefs(0x28 | 0x3);
+
     return TRUE;
 }
 
 
 VOID SimpleVT::UnInitialize() {
+    if (m_VMXOn) {
+        __vmx_off();
+    }
     if (m_VMXRegion) {
         MmFreeNonCachedMemory(m_VMXRegion, PAGE_SIZE);
     }
@@ -119,11 +325,44 @@ VOID SimpleVT::UnInitialize() {
 
 
 BOOLEAN SimpleVT::Install() {
+    print("[%d]准备启动虚拟化", m_CPU);
+
+    m_VMXOn = TRUE;
+    vmxlaunch();  // 如果这句话执行成功, 就不会返回
+
+    print("[%d]不应该执行到这里", m_CPU);
+
+    if (m_VMXOn) {
+        __vmx_off();
+        m_VMXOn = FALSE;
+    }
+
     return TRUE;
 }
 
 
 BOOLEAN SimpleVT::UnInstall() {
+    return TRUE;
+    if (m_VMXOn) {
+        Asm_VmxCall('BYE');
+        m_VMXOn = FALSE;
+    }
+    if (m_EPT) {
+        MmFreeContiguousMemory(m_EPT);
+    }
+    if (m_VMXRegion) {
+        MmFreeNonCachedMemory(m_VMXRegion, PAGE_SIZE);
+    }
+    if (m_VMCSRegion) {
+        MmFreeNonCachedMemory(m_VMCSRegion, PAGE_SIZE);
+    }
+    if (m_MsrBitmapRegion) {
+        MmFreeNonCachedMemory(m_MsrBitmapRegion, PAGE_SIZE);
+    }
+    if (m_VMXRootStackRegion) {
+        MmFreeNonCachedMemory(&m_VMXRootStackRegion, PAGE_SIZE * 3);
+    }
+
     return TRUE;
 }
 
@@ -181,15 +420,19 @@ VOID SimpleVT::GdtEntryToVmcsFormat(
     return VOID();
 }
 
-BOOLEAN SimpleVT::InitVMCS() {
+VOID SimpleVT::InitVMCS() {
     ULONG_PTR base, limit, rights;
     // Guest 状态
     StackPointer = (ULONG_PTR)Asm_StackPointer();
+    // DbgBreakPoint();
     ReturnAddress = (ULONG_PTR)Asm_NextInstructionPointer();
+
     if (m_VMXOn) {
-        print("虚拟化正在运行！");
-        return FALSE;
+        DbgPrint("[%d]虚拟化【正在运行】!\n", m_CPU);
+        return;
     }
+
+
     m_VMXRegionPhysAddr = MmGetPhysicalAddress(m_VMXRegion).QuadPart;
     m_VMCSRegionPhysAddr = MmGetPhysicalAddress(m_VMCSRegion).QuadPart;
     m_MsrBitmapRegionPhysAddr = MmGetPhysicalAddress(m_MsrBitmapRegion).QuadPart;
@@ -239,7 +482,7 @@ BOOLEAN SimpleVT::InitVMCS() {
     __writecr4(m_GuestState.cr4);
 
     m_HostState.cr0 = __readcr0();
-    // m_HostState.cr3 = __readcr3();
+    m_HostState.cr3 = __readcr3();
     m_HostState.cr4 = __readcr4();
 
     m_HostState.cs = __readcs() & 0xF8;
@@ -284,7 +527,7 @@ BOOLEAN SimpleVT::InitVMCS() {
 #endif  // ENABLE_EPT
 
     // VM执行控制域 Msr
-    VMWRITE_ERR_RET(MSR_BITMAP, m_MsrBitmapRegionPhysAddr);
+    VMWRITE_ERR_RET(MSR_BITMAP, m_MsrBitmapRegionPhysAddr);  // 位图
 
 #ifdef ENABLE_EPT
 
@@ -388,6 +631,32 @@ BOOLEAN SimpleVT::InitVMCS() {
     VMWRITE_ERR_RET(GUEST_TR_BASE, base);
     m_HostState.trbase = base;
 
+    GdtEntryToVmcsFormat(m_GuestState.ldtr, &base, &limit, &rights);
+    VMWRITE_ERR_RET(GUEST_LDTR_SELECTOR, m_GuestState.ldtr);
+    VMWRITE_ERR_RET(GUEST_LDTR_LIMIT, limit);
+    VMWRITE_ERR_RET(GUEST_LDTR_AR_BYTES, rights);
+    VMWRITE_ERR_RET(GUEST_LDTR_BASE, base);
+
+    VMWRITE_ERR_RET(GUEST_GDTR_BASE, m_GuestState.gdt.ulBase);
+    VMWRITE_ERR_RET(GUEST_GDTR_LIMIT, m_GuestState.gdt.wLimit);
+
+    VMWRITE_ERR_RET(GUEST_IDTR_BASE, m_GuestState.idt.ulBase);
+    VMWRITE_ERR_RET(GUEST_IDTR_LIMIT, m_GuestState.idt.wLimit);
+
+    // GUEST CR
+    VMWRITE_ERR_RET(GUEST_CR0, m_GuestState.cr0);
+    VMWRITE_ERR_RET(GUEST_CR3, m_GuestState.cr3);
+    VMWRITE_ERR_RET(GUEST_CR4, m_GuestState.cr4);
+    VMWRITE_ERR_RET(CR0_READ_SHADOW, m_GuestState.cr0);
+    VMWRITE_ERR_RET(CR4_READ_SHADOW, m_GuestState.cr4);
+
+    VMWRITE_ERR_RET(GUEST_DR7, m_GuestState.dr7);
+    VMWRITE_ERR_RET(GUEST_IA32_DEBUGCTL, m_GuestState.msr_debugctl);
+
+    VMWRITE_ERR_RET(GUEST_RSP, m_GuestState.rsp);
+    VMWRITE_ERR_RET(GUEST_RIP, m_GuestState.rip);
+    VMWRITE_ERR_RET(GUEST_RFLAGS, m_GuestState.rflags);
+
 
     // 宿主机状态
     VMWRITE_ERR_RET(HOST_CS_SELECTOR, m_HostState.cs);
@@ -404,16 +673,27 @@ BOOLEAN SimpleVT::InitVMCS() {
     VMWRITE_ERR_RET(HOST_TR_BASE, m_HostState.trbase);
     VMWRITE_ERR_RET(HOST_TR_SELECTOR, m_HostState.tr);
 
+    VMWRITE_ERR_RET(HOST_GDTR_BASE, m_HostState.gdt.ulBase);
+    VMWRITE_ERR_RET(HOST_IDTR_BASE, m_HostState.idt.ulBase);
 
-    __vmx_off();
-    m_VMXOn = FALSE;
-    return TRUE;
+    // HOST CR0
+    VMWRITE_ERR_RET(HOST_CR0, m_HostState.cr0);
+    VMWRITE_ERR_RET(HOST_CR3, m_HostState.cr3);
+    VMWRITE_ERR_RET(HOST_CR4, m_HostState.cr4);
+
+    VMWRITE_ERR_RET(HOST_RSP, m_HostState.rsp);
+    VMWRITE_ERR_RET(HOST_RIP, m_HostState.rip);
+
+    // 初始化VMCS完毕
+    return;
 }
 
 VOID SimpleVT::InitializeEPT() {
     PHYSICAL_ADDRESS highest;
-    highest.QuadPart = 0xFFFFFFFFFFFFFFFF;
     MTRR_CAPABILITIES mtrrCapabilities;
+
+
+    highest.QuadPart = 0xFFFFFFFFFFFFFFFF;
     MTRR_VARIABLE_BASE mtrrBase;
     MTRR_VARIABLE_MASK mtrrMask;
 

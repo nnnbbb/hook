@@ -61,7 +61,7 @@ VOID VTUnLoadProc(
     if (VT_CPU[uCPU]) {
         delete VT_CPU[uCPU];
     }
-    
+
     KeSignalCallDpcDone(SystemArgument1);
     KeSignalCallDpcSynchronize(SystemArgument2);
 }

@@ -1,0 +1,87 @@
+;
+; SimpleVT.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=SimpleVT.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+SimpleVT_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+SimpleVT.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%SimpleVT.DeviceDesc%=SimpleVT_Device, Root\SimpleVT ; TODO: edit hw-id
+
+[SimpleVT_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+SimpleVT.sys
+
+;-------------- Service installation
+[SimpleVT_Device.NT.Services]
+AddService = SimpleVT,%SPSVCINST_ASSOCSERVICE%, SimpleVT_Service_Inst
+
+; -------------- SimpleVT driver install sections
+[SimpleVT_Service_Inst]
+DisplayName    = %SimpleVT.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\SimpleVT.sys
+
+;
+;--- SimpleVT_Device Coinstaller installation ------
+;
+
+[SimpleVT_Device.NT.CoInstallers]
+AddReg=SimpleVT_Device_CoInstaller_AddReg
+CopyFiles=SimpleVT_Device_CoInstaller_CopyFiles
+
+[SimpleVT_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[SimpleVT_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[SimpleVT_Device.NT.Wdf]
+KmdfService =  SimpleVT, SimpleVT_wdfsect
+[SimpleVT_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "SimpleVT Installation Disk"
+SimpleVT.DeviceDesc = "SimpleVT Device"
+SimpleVT.SVCDESC = "SimpleVT Service"

@@ -23,21 +23,6 @@ struct RTL_PROCESS_MODULES {
 
 PVOID GetModuleBase(PCHAR ModuleName);
 
-typedef unsigned long ul32;
-typedef unsigned long long ul64;
-typedef signed long long i64;
-typedef volatile unsigned long long vu64;
-typedef unsigned int ui32;
-typedef void* pv;
-typedef void* pv64;
-typedef unsigned short u16;
-typedef unsigned char u8;
-typedef volatile unsigned char vu8;
-#define __db  __debugbreak
-#define noinl __declspec(noinline)
-#define naked __declspec(naked)
-#define inl   __forceinline
-
 #define RVA(Instr, InstrSize)       ((DWORD64)Instr + InstrSize + *(LONG*)((DWORD64)Instr + (InstrSize - sizeof(LONG))))
 #define RVA2(Instr, InstrSize, Off) ((DWORD64)Instr + InstrSize + *(LONG*)((DWORD64)Instr + Off))
 
@@ -324,9 +309,9 @@ BOOLEAN IsKernelDebuggerPresent();
 
 PVOID GetProcAddress(PVOID ModBase, const char* Name);
 
-NTSTATUS WritePhysicalSafe2(DWORD64 PhysicalAddress, pv Buffer, ul64 Length);
+NTSTATUS WritePhysicalSafe2(DWORD64 PhysicalAddress, pv Buffer, u64 Length);
 
-inl void KSleep(ul64 ms) {
+inl void KSleep(u64 ms) {
     LARGE_INTEGER delay;
     delay.QuadPart = -1000 * ms;
     KeDelayExecutionThread(KernelMode, TRUE, &delay);

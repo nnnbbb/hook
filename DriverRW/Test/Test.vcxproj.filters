@@ -18,12 +18,15 @@
     <ClCompile Include="main.cpp">
       <Filter>资源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Test-Message-Hook.cpp">
+    <ClCompile Include="message-hook.test.cpp">
+      <Filter>资源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="read-memory.test.cpp">
       <Filter>资源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test.h">
+    <ClInclude Include="test.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

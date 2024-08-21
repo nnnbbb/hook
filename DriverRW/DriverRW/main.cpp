@@ -4,6 +4,7 @@
 
 void DriverUnload(IN PDRIVER_OBJECT DriverObject) {
     UNREFERENCED_PARAMETER(DriverObject);
+    UnHooks();
     print("DriverUnload\r\n");
 }
 

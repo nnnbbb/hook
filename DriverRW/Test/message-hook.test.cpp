@@ -1,20 +1,11 @@
-#include <Windows.h>
-#include <iostream>
-
-PVOID(NTAPI* NtConvertBetweenAuxiliaryCounterAndPerformanceCounter)
-(ULONG64, PVOID, PVOID, PVOID);
-
-typedef struct _HOOK_DATA {
-    DWORD Magic;
-    int ControlCode;
-} HOOK_DATA, *PHOOK_DATA;
+#include "Test.h"
 
 
 int TestMessageHook() {
     std::cout << "[*] resolving NtConvertBetweenAuxiliaryCounterAndPerformanceCounter from ntdll.dll" << std::endl;
-    *(PVOID*)&NtConvertBetweenAuxiliaryCounterAndPerformanceCounter =
+    *(PVOID*)&NtPerformanceCounter =
         GetProcAddress(GetModuleHandle(L"ntdll.dll"), "NtConvertBetweenAuxiliaryCounterAndPerformanceCounter");
-    if (!NtConvertBetweenAuxiliaryCounterAndPerformanceCounter) {
+    if (!NtPerformanceCounter) {
         std::cerr << "[*} failed to resolve NtConvertBetweenAuxiliaryCounterAndPerformanceCounter" << std::endl;
         return -1;
     }
@@ -27,6 +18,6 @@ int TestMessageHook() {
     PVOID pData = (PVOID)&Data;
     INT64 Status = 0;
 
-    NtConvertBetweenAuxiliaryCounterAndPerformanceCounter(1, &pData, &Status, 0);
+    NtPerformanceCounter(1, &pData, &Status, 0);
     return 0;
 }

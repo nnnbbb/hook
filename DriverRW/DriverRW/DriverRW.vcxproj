@@ -144,12 +144,14 @@
   <ItemGroup>
     <ClCompile Include="get-module.util.cpp" />
     <ClCompile Include="hooks.cpp" />
+    <ClCompile Include="kernel-read-write-memory.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="get-module.util.h" />
     <ClInclude Include="hooks.h" />
+    <ClInclude Include="kernel-read-write-memory.h" />
     <ClInclude Include="utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

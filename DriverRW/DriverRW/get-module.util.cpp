@@ -42,26 +42,30 @@ PVOID GetModuleBase(PCHAR ModuleName) {
 }
 
 NTSTATUS getKernelModuleByName(const char* moduleName, PVOID* moduleStart, size_t* moduleSize) {
-    if (!moduleStart)
+    if (!moduleStart) {
         return STATUS_INVALID_PARAMETER;
+    }
 
     size_t size{};
     ZwQuerySystemInformation(SystemModuleInformation, nullptr, size, reinterpret_cast<PULONG>(&size));
 
     const auto listHeader = ExAllocatePool(NonPagedPool, size);
-    if (!listHeader)
+    if (!listHeader) {
         return STATUS_MEMORY_NOT_ALLOCATED;
+    }
 
-    if (const auto status = ZwQuerySystemInformation(SystemModuleInformation, listHeader, size, reinterpret_cast<PULONG>(&size)))
+    if (const auto status = ZwQuerySystemInformation(SystemModuleInformation, listHeader, size, reinterpret_cast<PULONG>(&size))) {
         return status;
+    }
 
     auto currentModule = reinterpret_cast<PSYSTEM_MODULE_INFORMATION>(listHeader)->Module;
     for (size_t i = 0; i < reinterpret_cast<PSYSTEM_MODULE_INFORMATION>(listHeader)->Count; ++i, ++currentModule) {
         const auto currentModuleName = reinterpret_cast<const char*>(currentModule->FullPathName + currentModule->OffsetToFileName);
         if (!strcmp(moduleName, currentModuleName)) {
             *moduleStart = currentModule->ImageBase;
-            if (moduleSize)
+            if (moduleSize) {
                 *moduleSize = currentModule->ImageSize;
+            }
             return STATUS_SUCCESS;
         }
     }
@@ -75,8 +79,9 @@ NTSTATUS getKernelModuleByName(const char* moduleName, PVOID* moduleStart, size_
 BOOLEAN StrICmp(const char* Str, const char* InStr, BOOLEAN Two) {
 #define ToLower(Char) ((Char >= 'A' && Char <= 'Z') ? (Char + 32) : Char)
 
-    if (!Str || !InStr)
+    if (!Str || !InStr) {
         return FALSE;
+    }
 
     WCHAR c1, c2;
     do {
@@ -84,8 +89,9 @@ BOOLEAN StrICmp(const char* Str, const char* InStr, BOOLEAN Two) {
         c2 = *InStr++;
         c1 = ToLower(c1);
         c2 = ToLower(c2);
-        if (!c1 && (Two ? !c2 : 1))
+        if (!c1 && (Two ? !c2 : 1)) {
             return TRUE;
+        }
     } while (c1 == c2);
 
     return FALSE;
@@ -135,13 +141,16 @@ PUCHAR FindPatternSect(PVOID ModBase, const char* SectName, const char* Pattern)
     PUCHAR ModuleStart = (PUCHAR)FindSection(ModBase, SectName, &SectSize);
     PUCHAR ModuleEnd = ModuleStart + SectSize;
 
-    if (!ModuleStart) return nullptr;
+    if (!ModuleStart) {
+        return nullptr;
+    }
 
     // scan pattern main
     PUCHAR FirstMatch = nullptr;
     const char* CurPatt = Pattern;
-    if (*Pattern == '\0')
+    if (*Pattern == '\0') {
         CurPatt++;
+    }
 
     for (; ModuleStart < ModuleEnd; ++ModuleStart) {
         bool SkipByte = (*CurPatt == '\?');
@@ -149,7 +158,7 @@ PUCHAR FindPatternSect(PVOID ModBase, const char* SectName, const char* Pattern)
         // hp(ModuleStart);
         UCHAR byte1;
         if (!readByte(ModuleStart, &byte1)) {
-            auto addr2 = (ul64)ModuleStart;
+            auto addr2 = (u64)ModuleStart;
             addr2 &= 0xFFFFFFFFFFFFF000;
             addr2 += 0xFFF;
             ModuleStart = (PUCHAR)addr2;
@@ -158,15 +167,18 @@ PUCHAR FindPatternSect(PVOID ModBase, const char* SectName, const char* Pattern)
         }
 
         if (SkipByte || byte1 == GetByte(CurPatt)) {
-            if (!FirstMatch) FirstMatch = ModuleStart;
-            if (SkipByte)
+            if (!FirstMatch) {
+                FirstMatch = ModuleStart;
+            }
+            if (SkipByte) {
                 CurPatt += 2;
-            else
+            } else {
                 CurPatt += 3;
-            if (CurPatt[-1] == 0) return FirstMatch;
-        }
-
-        else if (FirstMatch) {
+            }
+            if (CurPatt[-1] == 0) {
+                return FirstMatch;
+            }
+        } else if (FirstMatch) {
             ModuleStart = FirstMatch;
         Skip:
             FirstMatch = nullptr;
@@ -192,8 +204,9 @@ PUCHAR FindPatternRange(pv Start, ui32 size, const char* Pattern) {
     // scan pattern main
     PUCHAR FirstMatch = nullptr;
     const char* CurPatt = Pattern;
-    if (*Pattern == '\0')
+    if (*Pattern == '\0') {
         CurPatt++;
+    }
 
     for (; ModuleStart < ModuleEnd; ++ModuleStart) {
         bool SkipByte = (*CurPatt == '\?');
@@ -201,7 +214,7 @@ PUCHAR FindPatternRange(pv Start, ui32 size, const char* Pattern) {
         // hp(ModuleStart);
         UCHAR byte1;
         if (!readByte(ModuleStart, &byte1)) {
-            auto addr2 = (ul64)ModuleStart;
+            auto addr2 = (u64)ModuleStart;
             addr2 &= 0xFFFFFFFFFFFFF000;
             addr2 += 0xFFF;
             ModuleStart = (PUCHAR)addr2;
@@ -212,10 +225,10 @@ PUCHAR FindPatternRange(pv Start, ui32 size, const char* Pattern) {
         if (SkipByte || byte1 == GetByte(CurPatt)) {
             if (!FirstMatch) FirstMatch = ModuleStart;
             SkipByte ? CurPatt += 2 : CurPatt += 3;
-            if (CurPatt[-1] == 0) return FirstMatch;
-        }
-
-        else if (FirstMatch) {
+            if (CurPatt[-1] == 0) {
+                return FirstMatch;
+            }
+        } else if (FirstMatch) {
             ModuleStart = FirstMatch;
         Skip:
             FirstMatch = nullptr;
@@ -260,8 +273,9 @@ PVOID GetProcAddress(PVOID ModBase, const char* Name) {
         const char* ExpName = (const char*)ModBase + ((ULONG*)((ULONG64)ModBase + ExportDir->AddressOfNames))[i];
 
         // check export name
-        if (StrICmp(Name, ExpName, true))
+        if (StrICmp(Name, ExpName, true)) {
             return (PVOID)((ULONG64)ModBase + ((ULONG*)((ULONG64)ModBase + ExportDir->AddressOfFunctions))[Ordinal]);
+        }
     }
 
     // no export
@@ -269,12 +283,13 @@ PVOID GetProcAddress(PVOID ModBase, const char* Name) {
 }
 
 // MmMapIoSpace, not allow write to page table
-NTSTATUS WritePhysicalSafe2(DWORD64 PhysicalAddress, pv Buffer, ul64 Length) {
+NTSTATUS WritePhysicalSafe2(DWORD64 PhysicalAddress, pv Buffer, u64 Length) {
     PHYSICAL_ADDRESS phy;
     phy.QuadPart = PhysicalAddress;
     PVOID MapedVirt = MmMapIoSpace(phy, Length, MmNonCached);
-    if (!MapedVirt)
+    if (!MapedVirt) {
         return STATUS_UNSUCCESSFUL;
+    }
 
     memcpy(MapedVirt, Buffer, Length);
     MmUnmapIoSpace(MapedVirt, Length);

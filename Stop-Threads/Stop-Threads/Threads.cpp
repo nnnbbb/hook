@@ -90,6 +90,8 @@ PROCESSENTRY32* FindByProcessName(const WCHAR* processName) {
     }
 
     do {
+        // std::wcout << L"szExeFile: " << process->szExeFile << '\n';
+
         if (wcscmp(process->szExeFile, processName) == 0) {
             CloseHandle(hProcessSnap);
             return process;
@@ -100,9 +102,8 @@ PROCESSENTRY32* FindByProcessName(const WCHAR* processName) {
     delete process;
     return nullptr;
 }
-VOID MyThread() {
-}
-BOOL MatchByThreadByName(DWORD& th32ThreadID, const WCHAR* ModuleName) {
+
+BOOL MatchByThreadByNameAndStop(DWORD& th32ThreadID, const WCHAR* ModuleName) {
     HANDLE hThread = ::OpenThread(
         THREAD_ALL_ACCESS,  // 访问权限，THREAD_ALL_ACCESS ：所有权限
         FALSE,              // 由此线程创建的进程不继承线程的句柄
@@ -159,10 +160,12 @@ BOOL MatchByThreadByName(DWORD& th32ThreadID, const WCHAR* ModuleName) {
         // std::wcout << L"th32ThreadID: " << th32ThreadID << L" hThread: " << hThread << L" baseName: " << baseName << '\n';
 
         SuspendThread(hThread);
+        SuspendThread((HANDLE)th32ThreadID);
         return TRUE;
 
     } else {
         ResumeThread(hThread);
+        ResumeThread((HANDLE)th32ThreadID);
     }
     return FALSE;
 }
@@ -199,7 +202,7 @@ VOID CheckLoop(PROCESSENTRY32W& process) {
 
             // 将区域设置设置为从操作系统获取的ANSI代码页
             setlocale(LC_ALL, ".ACP");
-            BOOL Match = MatchByThreadByName(ThreadEntry32.th32ThreadID, L"EPStableCommon.dll");
+            BOOL Match = MatchByThreadByNameAndStop(ThreadEntry32.th32ThreadID, L"EPStableCommon.dll");
             HANDLE ThreadID = (HANDLE)ThreadEntry32.th32ThreadID;
             if (Match) {
                 DWORD r = SuspendThread(ThreadID);
@@ -214,17 +217,20 @@ VOID CheckLoop(PROCESSENTRY32W& process) {
                     // std::wcout << L"线程未被挂起: " << r << '\n';
                 }
                 i++;
-            } else {
-
-                ResumeThread(ThreadID);
             }
         }
     }
 }
 
 int main(int argc, const char* argv[]) {
-    PROCESSENTRY32 process = *(FindByProcessName(L"mxmain.dll"));  // 进程快照信息
+    PROCESSENTRY32* GenDumpProcess = FindByProcessName(L"GenDump.dll");
+    PROCESSENTRY32 process = *(FindByProcessName(L"mxmain.dll"));
+    printf("Pid = %d\n", process.th32ProcessID);
 
+    if (GenDumpProcess) {
+        system("taskkill /f /im GenDump.dll");
+        printf("Close GenDump ProcessID = %d\n", GenDumpProcess->th32ProcessID);
+    }
     CheckLoop(process);
     system("pause");
     while (true) {

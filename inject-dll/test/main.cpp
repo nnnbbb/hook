@@ -4,14 +4,16 @@
 #include <tlhelp32.h>
 
 // 根据进程名得到进程PID
-DWORD GetPidByName(const char* name) {
+DWORD GetPidByName(const WCHAR* name) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
     DWORD pid = 0;
 
     if (Process32First(snapshot, &pe32)) {
         do {
-            if (_stricmp((char*)pe32.szExeFile, name) == 0) {
+            WCHAR* szName = pe32.szExeFile;
+            //printf("szName = %ls\n", szName);
+            if (wcscmp(szName, name) == 0) {
                 pid = pe32.th32ProcessID;
                 break;
             }
@@ -28,9 +30,9 @@ void FullScreenAttack() {
         mov ecx,dword ptr ds:[0x00755EAC]
         mov ecx,[ecx+0x868]
         push 0xFFFFFFFF
-        push 0 // 植物id  
-        mov eax,0 // y
-        push 0    // x
+        push 0  // 植物id  
+        mov eax,0  // y
+        push 0  // x
         push ecx
         mov esi,0x00418D70
         call esi
@@ -77,8 +79,8 @@ BOOL InjectCode(DWORD dwProcId, LPVOID mFunc) {
     WaitForSingleObject(hThread, INFINITE);
 
     // 释放内存空间
-    //BOOL virtual_flag = VirtualFreeEx(hProcess, mFuncAddr, 128, MEM_RELEASE);
-    //if (virtual_flag == FALSE) {
+    // BOOL virtual_flag = VirtualFreeEx(hProcess, mFuncAddr, 128, MEM_RELEASE);
+    // if (virtual_flag == FALSE) {
     //    return FALSE;
     //}
 
@@ -88,9 +90,7 @@ BOOL InjectCode(DWORD dwProcId, LPVOID mFunc) {
 
     return TRUE;
 }
-
-int main(int argc, char* argv[]) {
-    // 得到进程PID
+int PvzHook() {
     HWND Hwnd = FindWindowA(NULL, "Plants vs. Zombies");
     DWORD Pid = 0;
     if (Hwnd == NULL) {
@@ -103,7 +103,37 @@ int main(int argc, char* argv[]) {
     if (ref == TRUE) {
         printf("[+] 代码注入完成 \n");
     }
+}
+void hookFn() {
+    printf("11");
+}
+int main(int argc, char* argv[]) {
+    // 得到进程PID
+    DWORD Pid = GetPidByName(L"mxmain.dll");
+    printf("Pid = %d\n", Pid);
+    // 打开当前进程
+    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, Pid);
+    if (hProcess == NULL) {
+        return FALSE;
+    }
+
+    printf("[*] 打开目标进程 \n");
+
+    // 分配内存空间
+    PVOID mFuncAddr = VirtualAllocEx(hProcess, NULL, 128, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    printf("[*] mFuncAddr %p\n", mFuncAddr);
+    if (mFuncAddr == NULL) {
+        return FALSE;
+    }
+    DWORD NumberOfByte;
+    WriteProcessMemory(hProcess, mFuncAddr, hookFn, 128, &NumberOfByte);
+    HANDLE hThread = CreateRemoteThread(hProcess, NULL, 0, (LPTHREAD_START_ROUTINE)mFuncAddr, 0, 0, &NumberOfByte);
+    //WaitForSingleObject(hThread, INFINITE);
 
     system("pause");
+    /*
+    1. hook地址jmp到自己的代码执行 ebp==00197D00 把 [ebp+8] 的值给某个变量
+    2. 创建线程 监听这个变量是否被赋值  被赋值了就取到背包打开关闭的基地址
+    */
     return 0;
 }

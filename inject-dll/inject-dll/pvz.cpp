@@ -2,12 +2,13 @@
 #include "pvz.h"
 
 // 读取指定内存地址的四个字节的值
-uint32_t R4(int value) {
-    // 将int值转换为指针
-    int v = *reinterpret_cast<int*>(value);
-
-    // 返回指针指向的内存地址的值
-    return v;
+uint32_t R4(int address) {
+    __try {
+        int v = *reinterpret_cast<int*>(address);
+        return v;
+    } __except (EXCEPTION_EXECUTE_HANDLER) {
+        return 0;
+    }
 }
 
 // 写入四个字节的值到指定内存地址
@@ -20,9 +21,9 @@ void W4(void* address, uint32_t value) {
 
 template <typename T>
 std::string hex(T number) {
-  std::stringstream ss;
-  ss << "0x" << std::hex << std::setw(2) << std::setfill('0') << number;
-  return ss.str();
+    std::stringstream ss;
+    ss << "0x" << std::hex << std::setw(2) << std::setfill('0') << number;
+    return ss.str();
 }
 
 template <class T>
@@ -41,15 +42,15 @@ void log(Args... args) {
 
     std::cout << dt << " ";  // Print timestamp to console
 
-    //std::string path = fs::current_path().string() + "/log.txt";
+    // std::string path = fs::current_path().string() + "/log.txt";
     std::string path = "E:/BaiduNetdiskDownload/hack/code/inject-dll/Debug/log.txt";
     // Write to log file
-    std::ofstream file(path, std::ios_base::app | std::ios::out); // 以utf-8编码格式打开文件
+    std::ofstream file(path, std::ios_base::app | std::ios::out);  // 以utf-8编码格式打开文件
     if (file.is_open()) {
-        file << dt << " ";                                               // Write timestamp
+        file << dt << " ";                                           // Write timestamp
         int _[] = {0, ((_print(args), file << args << " "), 0)...};  // Expand args
-        file << std::endl;                                               // End of log entry
-        file.close();                                                    // Close file
+        file << std::endl;                                           // End of log entry
+        file.close();                                                // Close file
     }
 }
 
@@ -165,7 +166,7 @@ void Pvz::FullScreenPlant(int PlantId) {
     for (size_t x = 0; x <= 8; x++) {
         for (size_t y = 0; y <= 5; y++) {
             __asm {
-                //pushad
+                // pushad
                 mov ecx,dword ptr ds:[0x00755EAC]
                 mov ecx,[ecx+0x868]
                 push 0xFFFFFFFF
@@ -175,13 +176,13 @@ void Pvz::FullScreenPlant(int PlantId) {
                 push ecx
                 mov esi,0x00418D70
                 call esi
-                //popad
+                // popad
             }
         }
     }
 }
 
-//所有植物卡片可以点击
+// 所有植物卡片可以点击
 BOOL Pvz::OpenCardClickable() {
     log("OpenCardClickable");
 
@@ -202,18 +203,18 @@ BOOL Pvz::CloseCardClickable() {
     return FALSE;
 }
 
-//阳光冷却地址
-//PlantsVsZombies.exe+6DE0E  0046DE18
+// 阳光冷却地址
+// PlantsVsZombies.exe+6DE0E  0046DE18
 
-//植物种植call
-//push ecx
-//mov ecx,dword ptr ds:[0x00755EAC]
-//mov ecx,[ecx+0x868]
-//push 0xFFFFFFFF
-//push 3
-//mov eax,2
-//push 2
-//push ecx
-//mov esi,0x00418D70
-//call esi
-//pop ecx
+// 植物种植call
+// push ecx
+// mov ecx,dword ptr ds:[0x00755EAC]
+// mov ecx,[ecx+0x868]
+// push 0xFFFFFFFF
+// push 3
+// mov eax,2
+// push 2
+// push ecx
+// mov esi,0x00418D70
+// call esi
+// pop ecx

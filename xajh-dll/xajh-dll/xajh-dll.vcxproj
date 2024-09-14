@@ -140,10 +140,10 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe'"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe'"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -173,10 +173,10 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe'"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe'"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -210,10 +210,10 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe'"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe'"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -247,10 +247,10 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe'"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe'"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>powershell -Command "Start-Process 'E:/BaiduNetdiskDownload/hack/code/xajh-dll/bin/Win32/injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
+      <Command>powershell -Command "Start-Process '$(SolutionDir)\bin\$(Platform)\injector.exe' -ArgumentList 'param1' -NoNewWindow"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

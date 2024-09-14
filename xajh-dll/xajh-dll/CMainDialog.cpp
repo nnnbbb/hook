@@ -222,7 +222,7 @@ void CMainDialog::OnBnClickedButton4() {
             continue;
         }
         DWORD wxID = *(DWORD*)mpAddress;
-        str.Format(L"wxID = 0x%40X\r\n", wxID);
+        str.Format(L"wxID = 0x%08X\r\n", wxID);
         m_content.Append(str);
     }
 

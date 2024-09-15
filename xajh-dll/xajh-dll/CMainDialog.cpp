@@ -25,7 +25,7 @@ BOOL CMainDialog::OnInitDialog() {
     // MakeWindowTopMost();
     // 设置窗口的位置和大小
     int x = 1040;      // X坐标
-    int y = 1050;      // Y坐标
+    int y = 900;       // Y坐标
     int width = 600;   // 宽度
     int height = 400;  // 高度
     // SetWindowPos(NULL, x, y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
@@ -46,10 +46,10 @@ void CMainDialog::DoDataExchange(CDataExchange* pDX) {
 
 
 BEGIN_MESSAGE_MAP(CMainDialog, CDialogEx)
-ON_BN_CLICKED(IDC_BUTTON1, &CMainDialog::OnBnClickedButton1)
-ON_BN_CLICKED(IDC_BUTTON2, &CMainDialog::OnBnClickedButton2)
+ON_BN_CLICKED(IDC_BUTTON1, &CMainDialog::OnBnClickedBagList)
+ON_BN_CLICKED(IDC_BUTTON2, &CMainDialog::OnBnClickedSpeak)
 ON_BN_CLICKED(IDC_BUTTON3, &CMainDialog::OnBnClickedAroundNPC)
-ON_BN_CLICKED(IDC_BUTTON4, &CMainDialog::OnBnClickedButton4)
+ON_BN_CLICKED(IDC_BUTTON4, &CMainDialog::OnBnClickedWxList)
 END_MESSAGE_MAP()
 
 
@@ -115,7 +115,7 @@ void PrintCString(const CString& cstr) {
     printf("%s", str);
 }
 
-void CMainDialog::OnBnClickedButton1() {
+void CMainDialog::OnBnClickedBagList() {
     int length = 20;
     wchar_t utf16_str[20] = {};
     // [[[[[[[14C0BF0]+ 24] + 90] + 8] + 14] + 8 + 24] + eax * 4]
@@ -146,7 +146,7 @@ void CMainDialog::OnBnClickedButton1() {
 }
 
 
-void CMainDialog::OnBnClickedButton2() {
+void CMainDialog::OnBnClickedSpeak() {
     UpdateData(TRUE);
     LPCWSTR content = m_content.GetString();
     _asm {
@@ -198,32 +198,83 @@ void CMainDialog::OnBnClickedAroundNPC() {
     UpdateData(FALSE);
 }
 
-
-void CMainDialog::OnBnClickedButton4() {
-    // TODO: 在此添加控件通知处理程序代码
+DWORD GetSkillName(DWORD skillId) {
+    DWORD skillObj = 0;
+    _asm {
+        // ecx
+        mov eax, 0x004AEFB0;
+        call eax;
+        mov eax, dword ptr ds:[eax+0x28];
+        mov ecx, eax;
+        // call
+        push skillId;
+        mov eax, 0x00535760;
+        call eax;
+        mov skillObj, eax;
+    }
+    if (skillObj != 0) {
+        DWORD skillName = *(DWORD*)(skillObj + 0x20);
+        return skillName;
+    }
+    return 0;
+}
+void CMainDialog::OnBnClickedWxList() {
     DWORD mpObj = 0;
     _asm {
-        mov eax, 0x004AEFA0
-        call eax
-        mov eax, dword ptr ds:[eax+0x7A6]
-        mov ecx, dword ptr ds:[0x014C0BF0]
-        mov ecx, dword ptr ds:[ecx+0x20C]
-        push eax
-        mov eax, 0x00809030
-        call eax
-        mov mpObj, eax
+        mov eax, 0x004AEFA0;
+        call eax;
+        mov eax, dword ptr ds:[eax+0x7A6];
+        mov ecx, dword ptr ds:[0x014C0BF0];
+        mov ecx, dword ptr ds:[ecx+0x20C];
+        push eax;
+        mov eax, 0x00809030;
+        call eax;
+        mov mpObj, eax;
     }
     CString str;
     // 武学列表
-    DWORD mpArrary = mpObj + 0x620;
+    DWORD wxArrary = mpObj + 0x620;
     for (size_t i = 0; i < 5; i++) {
-        DWORD mpAddress = mpArrary + i * 4;
-        if (mpAddress == 0) {
+        DWORD wxAddress = wxArrary + i * 4;
+        if (wxAddress == 0) {
             continue;
         }
-        DWORD wxID = *(DWORD*)mpAddress;
-        str.Format(L"wxID = 0x%08X\r\n", wxID);
-        m_content.Append(str);
+        DWORD wxID = *(DWORD*)wxAddress;
+        DWORD flag = 0;
+        DWORD wxBigObj = 0;
+        _asm {
+            lea ecx, flag;
+            push ecx;
+            push 0;
+            push wxID;
+            // ecx
+            mov ecx, 0x014C0BF0;
+            mov ecx, [ecx];
+            mov ecx, dword ptr ds:[ecx+0x1A8];
+            mov eax, 0x00C4A660;
+            call eax;
+            mov wxBigObj, eax;
+        }
+        if (flag != 0x61) {
+            continue;
+        }
+        DWORD wxName = wxBigObj + 0x4;
+        DWORD skillArrary = wxBigObj + 0x164;
+        if (wxID != 0) {
+            str.Format(L"~~~~~~Name = %s wxID = 0x%08X~~~~~\r\n", (wchar_t*)wxName, wxID);
+            m_content.Append(str);
+        }
+
+        for (size_t j = 0; j < 0x20; j++) {
+            DWORD* skill = (DWORD*)(skillArrary + j * 8);
+            DWORD skillId = *skill;
+            if (skillId != 0) {
+                DWORD skillName = GetSkillName(skillId);
+                str.Format(L"wxName = %s ", (wchar_t*)wxName);
+                str.Format(L"skillName = %s, 当前武学技能ID为:%X\r\n", (wchar_t*)skillName, skillId);
+                m_content.Append(str);
+            }
+        }
     }
 
     UpdateData(FALSE);

@@ -35,8 +35,8 @@ class CMainDialog : public CDialogEx {
     DECLARE_MESSAGE_MAP()
    public:
     CString m_content;
-    afx_msg void OnBnClickedButton1();
-    afx_msg void OnBnClickedButton2();
+    afx_msg void OnBnClickedBagList();
+    afx_msg void OnBnClickedSpeak();
     afx_msg void OnBnClickedAroundNPC();
-    afx_msg void OnBnClickedButton4();
+    afx_msg void OnBnClickedWxList();
 };

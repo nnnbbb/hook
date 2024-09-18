@@ -29,7 +29,10 @@ int GetAssemblyHex(const char* asm_str, unsigned char** encode_ptr, size_t* size
 
     if ((err = (ks_err)ks_asm(ks, asm_str, 0, encode_ptr, size_ptr, &count)) != KS_ERR_OK) {
         dprintf("Failed to assemble given code = %s\n", ks_strerror((ks_err)err));
-        dprintf("Failed to assemble given asm_str = %s\n", asm_str);
+        
+        std::string message = "Failed to assemble given asm_str = " + std::string(asm_str);
+        dprintf("%s\n", message.c_str());
+        MessageBoxA(hwndDlg, message.c_str(), "Error", MB_ICONINFORMATION);
         return 1;
     }
 
@@ -86,6 +89,7 @@ std::variant<std::string, int> ProcessJmp(std::string& s, const SELECTIONDATA& s
 
         // 检查第二个元素是否包含 '.'
         size_t pos = secondToken.find('.');
+
         if (pos != std::string::npos) {
             // 去掉 '.' 之前的部分
             secondToken = secondToken.substr(pos + 1);
@@ -108,7 +112,6 @@ std::variant<std::string, int> ProcessJmp(std::string& s, const SELECTIONDATA& s
 
     } catch (const std::invalid_argument& e) {
         dprintf("Invalid argument exception: %s\n", e.what());  // 输出异常信息到标准错误
-
         return s;  // 如果转换失败，返回原字符串
     } catch (const std::out_of_range& e) {
         dprintf("Out of range exception: %s\n", e.what());  // 输出异常信息到标准错误
@@ -130,11 +133,12 @@ std::vector<std::string> ProcessInput(const std::string& input, SELECTIONDATA& s
     while ((pos = temp.find("\r\n")) != std::string::npos) {
         std::string s = temp.substr(0, pos);
         s = RemoveSegmentRegisters(s);
-        // 给数字添加 0x 前缀
-        s = AddHexPrefixToHexNumber(s);
 
         // 处理以 'j' 等需要计算偏移的指令
         auto result = ProcessJmp(s, sel);
+        std::string r = std::get<std::string>(result);
+        // 给数字添加 0x 前缀
+        s = AddHexPrefixToHexNumber(s);
         if (std::holds_alternative<std::string>(result)) {
             s = std::get<std::string>(result);
         }
@@ -147,9 +151,9 @@ std::vector<std::string> ProcessInput(const std::string& input, SELECTIONDATA& s
     if (!temp.empty()) {
         temp = RemoveSegmentRegisters(temp);
         // 给数字添加 0x 前缀
-        temp = AddHexPrefixToHexNumber(temp);
 
         auto result = ProcessJmp(temp, sel);
+        temp = AddHexPrefixToHexNumber(temp);
         if (std::holds_alternative<std::string>(result)) {
             temp = std::get<std::string>(result);
         }

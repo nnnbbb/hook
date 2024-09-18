@@ -42,6 +42,9 @@
     <Filter Include="Library Files">
       <UniqueIdentifier>{83b94fba-0963-43a4-b8bd-12730a208fad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\pluginsdk\keystone">
+      <UniqueIdentifier>{26e2c86a-1f9e-403d-99b5-5c1c779b67ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pluginsdk\capstone\arm.h">
@@ -286,6 +289,36 @@
     </ClInclude>
     <ClInclude Include="parser-assembly.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\arm.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\arm64.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\evm.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\hexagon.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\keystone.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\mips.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\ppc.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\sparc.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\systemz.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
+    </ClInclude>
+    <ClInclude Include="pluginsdk\keystone\x86.h">
+      <Filter>Header Files\pluginsdk\keystone</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

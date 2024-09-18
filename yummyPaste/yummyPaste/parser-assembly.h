@@ -2,7 +2,6 @@
 #include <variant>
 #include <regex>
 #include "plugin.h"
-#include <keystone/keystone.h>
 
 
 void PrintAscii(const char* asm_str);

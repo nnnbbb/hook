@@ -144,14 +144,27 @@ void MakePotatoPaste(int window) {
 
     std::vector<std::string> str = ProcessInput(pasteData, sel);
 
+    // 用于保存所有的编码数据
+    std::vector<unsigned char> encodedData;
+    size_t totalSize = 0;
+
     for (const std::string& s : str) {
-         // PrintAscii(s.c_str());
+        // PrintAscii(s.c_str());
         if (GetAssemblyHex((LPSTR)s.c_str(), &encode, &size) == 0) {
             // PrintMachineCode(s, encode, size);
 
-            DbgFunctions()->MemPatch(sel.start, encode, size);
-            sel.start += size;
+            // 将编码数据添加到 encodedData 向量中
+            encodedData.insert(encodedData.end(), encode, encode + size);
+            totalSize += size;
+        } else {
+            return;
         }
+    }
+
+    // 一次性写入所有的编码数据
+    if (!encodedData.empty()) {
+        DbgFunctions()->MemPatch(sel.start, encodedData.data(), totalSize);
+        sel.start += totalSize;
     }
 
     ks_free(encode);
@@ -191,8 +204,6 @@ PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info) {
             break;
         case MENU_DISASM_ABOUT:
         case MENU_DISASM_PASTE_ASSEBLY: {
-
-            // MessageBoxA(hwndDlg, "GetAssemblyHex assembly", "Tips", MB_ICONINFORMATION);
             __try {
                 MakePotatoPaste(GUI_DISASSEMBLY);
             } __except (1) {
@@ -201,7 +212,6 @@ PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info) {
             break;
         }
         case MENU_DUMP_PASTE_ASSEBLY: {
-
             __try {
                 MakePotatoPaste(GUI_DUMP);
             } __except (1) {
@@ -231,17 +241,6 @@ bool pluginInit(PLUG_INITSTRUCT* initStruct) {
 
 void pluginStop() {
     DestroyBinaryObject();
-}
-void test1() {
-    SELECTIONDATA sel;
-    sel.start = 0x5DB1CCD5;  // 示例起始值
-
-    std::string input = "jmp 0x5DB1CC84\r\n";
-    std::vector<std::string> result = ProcessInput(input, sel);
-
-    for (const auto& line : result) {
-        dprintf("%s\n", line.c_str());  // 使用 dprintf 输出到标准输出
-    }
 }
 
 void pluginSetup() {

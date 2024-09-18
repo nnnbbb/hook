@@ -27,6 +27,7 @@
 #include "pluginsdk/TitanEngine/TitanEngine.h"
 #include "pluginsdk/XEDParse/XEDParse.h"
 #include "pluginsdk/yara/yara.h"
+#include "pluginsdk/keystone/keystone.h"
 
 #ifdef _WIN64
 #pragma comment(lib, "pluginsdk/x64dbg.lib")
@@ -38,6 +39,7 @@
 #pragma comment(lib, "pluginsdk/TitanEngine/TitanEngine_x64.lib")
 #pragma comment(lib, "pluginsdk/XEDParse/XEDParse_x64.lib")
 #pragma comment(lib, "pluginsdk/yara/yara_x64.lib")
+#pragma comment(lib, "pluginsdk/keystone/keystone_x64.lib")
 #else
 #pragma comment(lib, "pluginsdk/x32dbg.lib")
 #pragma comment(lib, "pluginsdk/x32bridge.lib")
@@ -48,7 +50,8 @@
 #pragma comment(lib, "pluginsdk/TitanEngine/TitanEngine_x86.lib")
 #pragma comment(lib, "pluginsdk/XEDParse/XEDParse_x86.lib")
 #pragma comment(lib, "pluginsdk/yara/yara_x86.lib")
-#endif //_WIN64
+#pragma comment(lib, "pluginsdk/keystone/keystone_x86.lib")
+#endif  //_WIN64
 
 #define Cmd(x) DbgCmdExecDirect(x)
 #define Eval(x) DbgValFromString(x)

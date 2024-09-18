@@ -188,11 +188,13 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="parser-assembly.cpp" />
     <ClCompile Include="parser.cpp" />
     <ClCompile Include="plugin.cpp" />
     <ClCompile Include="pluginmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="parser-assembly.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="plugin.h" />
     <ClInclude Include="pluginmain.h" />

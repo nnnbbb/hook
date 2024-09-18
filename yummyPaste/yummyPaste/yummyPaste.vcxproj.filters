@@ -284,6 +284,9 @@
     <ClInclude Include="parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="parser-assembly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="pluginsdk\x32bridge.lib">
@@ -349,6 +352,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser-assembly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

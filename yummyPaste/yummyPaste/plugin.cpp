@@ -164,7 +164,6 @@ void MakePotatoPaste(int window) {
     // 一次性写入所有的编码数据
     if (!encodedData.empty()) {
         DbgFunctions()->MemPatch(sel.start, encodedData.data(), totalSize);
-        sel.start += totalSize;
     }
 
     ks_free(encode);
@@ -207,7 +206,7 @@ PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info) {
             __try {
                 MakePotatoPaste(GUI_DISASSEMBLY);
             } __except (1) {
-                dprintf("MENU_DISASM_PASTE_ASSEBLY err");
+                dprintf("MENU_DISASM_PASTE_ASSEBLY err\n");
             }
             break;
         }
@@ -215,7 +214,7 @@ PLUG_EXPORT void CBMENUENTRY(CBTYPE cbType, PLUG_CB_MENUENTRY* info) {
             __try {
                 MakePotatoPaste(GUI_DUMP);
             } __except (1) {
-                dprintf("MENU_DUMP_PASTE_ASSEBLY err");
+                dprintf("MENU_DUMP_PASTE_ASSEBLY err\n");
             }
             break;
         }
@@ -248,6 +247,7 @@ void pluginSetup() {
     _plugin_menuaddentry(hMenuDisasm, MENU_DISASM_PASTE_PATCH, "Paste and Patch");
     _plugin_menuaddentry(hMenuDisasm, MENU_DISASM_PASTE_ASSEBLY, "Paste assembly");
     _plugin_menuaddentry(hMenuDisasm, MENU_DISASM_ABOUT, "A&bout");
+    _plugin_menuentrysethotkey(pluginHandle, MENU_DISASM_PASTE_ASSEBLY, "Shift+Ins");
 
     _plugin_menuaddentry(hMenuDump, MENU_DUMP_PASTE, "&Paste it!");
     _plugin_menuaddentry(hMenuDump, MENU_DUMP_PASTE_PATCH, "Paste and Patch");

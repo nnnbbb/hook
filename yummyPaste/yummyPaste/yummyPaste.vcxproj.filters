@@ -376,6 +376,12 @@
     <Library Include="pluginsdk\yara\yara_x86.lib">
       <Filter>Library Files</Filter>
     </Library>
+    <Library Include="pluginsdk\keystone\keystone_x64.lib">
+      <Filter>Library Files</Filter>
+    </Library>
+    <Library Include="pluginsdk\keystone\keystone_x86.lib">
+      <Filter>Library Files</Filter>
+    </Library>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="plugin.cpp">

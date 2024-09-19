@@ -13,3 +13,5 @@ int GetAssemblyHex(const char* asm_str, unsigned char** encode_ptr, size_t* size
 std::string AddHexPrefixToHexNumber(const std::string& s);
 
 std::vector<std::string> ProcessInput(const std::string& input, SELECTIONDATA& sel);
+
+void TestProcessInput();

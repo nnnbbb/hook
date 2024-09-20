@@ -67,20 +67,19 @@ std::string WStringToString(const std::wstring& wstr) {
 
 void GetGoodsName(DWORD GoodsId, wchar_t* utf16_str, int length) {
     DWORD Tmp = 0;
-    DWORD* pTmp = &Tmp;
     DWORD NameAddr;
 
     _asm {
-		mov ecx, dword ptr ds : [0x14C0BF0]
-		mov ecx, dword ptr ds : [ecx + 0x1A8]
-
-		push  pTmp
-		push  0
-		push  GoodsId  // 物品id
-		mov eax, 0x00C4A660
-		call eax
-		add eax, 4
-		mov NameAddr, eax
+        mov ecx, dword ptr ds : [0x14C0BF0]
+        mov ecx, dword ptr ds : [ecx + 0x1A8]
+        lea   eax, Tmp
+        push  eax
+        push  0
+        push  GoodsId  // 物品id
+        mov eax, 0x00C4A660
+        call eax
+        add eax, 4
+        mov NameAddr, eax
     }
     memcpy(utf16_str, (PVOID)NameAddr, length);
 }
@@ -118,7 +117,7 @@ void PrintCString(const CString& cstr) {
 void CMainDialog::OnBnClickedBagList() {
     int length = 20;
     wchar_t utf16_str[20] = {};
-    // [[[[[[[14C0BF0]+ 24] + 90] + 8] + 14] + 8 + 24] + eax * 4]
+    // [[[[[[[14C0BF0]+ 24] + 90] + 8] + 14] + 2c] + eax * 4]
     DWORD******* BaseAddr = (DWORD*******)0x14C0BF0;
     DWORD* BagArrAddr = BaseAddr[0][0x24 / 4][0x90 / 4][0x8 / 4][0x14 / 4][0x2c / 4];
     for (size_t i = 0; i < 200; i++) {
@@ -164,34 +163,71 @@ void CMainDialog::OnBnClickedSpeak() {
     }
 }
 
+// npc阵营
+DWORD GetNpcGroup(DWORD npcStruct) {
+    // [[[0x14C2050+24]+8C]+1A84]
+    // 鼠标指针
+    DWORD*** baseAddress = (DWORD***)(0x14C2050 + 0x24);
+    DWORD mouseAddress = baseAddress[0][0x8C / 4][0x1A84 / 4];
+
+    DWORD npcIdLow = *(DWORD*)(npcStruct + 0x140);
+    DWORD npcIdHigh = *(DWORD*)(npcStruct + 0x144);
+
+    DWORD tmp = 0;
+    DWORD group = 0;
+
+    _asm {
+        push 0          ;  // 固定0 
+        lea  eax, tmp
+        push eax        ;  // 随意局部变量
+
+        push npcStruct  ;  // npc对象结构  +140是npcid
+        push npcIdHigh  ;  // 固定值 0x01000000
+        push npcIdLow   ;  // ipcid
+        mov  ecx, mouseAddress
+
+        mov  eax, 0x00741800
+        call eax
+        mov  group, eax;
+    }
+    return group;
+}
+
 void CMainDialog::OnBnClickedAroundNPC() {
-
-    DWORD****** NPCArrayBaseAddr = (DWORD******)(0x14C2050 + 0x24);
-    DWORD* NpcArrayStruct = NPCArrayBaseAddr[0][0x94 / 4][0x4 / 4][0xC / 4][0x74 / 4];
-    DWORD ObjectBeginAddr = NpcArrayStruct[0x1C / 4];
-    DWORD Len = NpcArrayStruct[0x24 / 4];
+    // [[[[[14C2050+24]+94]+4]+C]+74]
+    // [[[[[[[[14C2050+24]+94]+4]+C]+74]+1c] i * 4] + 4]
+    DWORD****** npcArrayBaseAddr = (DWORD******)(0x14C2050 + 0x24);
+    DWORD* npcArrayStruct = npcArrayBaseAddr[0][0x94 / 4][0x4 / 4][0xC / 4][0x74 / 4];
+    DWORD objectBeginAddr = npcArrayStruct[0x1C / 4];
+    DWORD len = npcArrayStruct[0x24 / 4];
     CString str;
-    for (size_t i = 0; i < Len; i++) {
-        DWORD NpcStruct = *(DWORD*)(ObjectBeginAddr + i * 4);
+    for (size_t i = 0; i < len; i++) {
+        DWORD npcStruct = *(DWORD*)(objectBeginAddr + i * 4);
 
-        if (NpcStruct == 0) {
+        if (npcStruct == 0) {
             continue;
         }
-        DWORD NpcRealStruct = *(DWORD*)(NpcStruct + 0x4);  // NPC结构体指针
-        DWORD NPCID = *(DWORD*)(NpcRealStruct + 0x140);
+        DWORD npcRealStruct = *(DWORD*)(npcStruct + 0x4);  // NPC结构体指针
+
+        DWORD npcId = *(DWORD*)(npcRealStruct + 0x140);
         // 获取虚函数表
-        DWORD Virtua1FunTable = ((DWORD*)NpcRealStruct)[0];
+        DWORD virtua1FunTable = ((DWORD*)npcRealStruct)[0];
         // 获取对象函数地址
-        DWORD GetNameFunc = *(DWORD*)(Virtua1FunTable + 0x88);
-        const wchar_t* NpcName = L"";
-        // LPWSTR NpcName = const_cast<LPWSTR>(L"");
+        DWORD getNameFunc = *(DWORD*)(virtua1FunTable + 0x88);
+        const wchar_t* npcName = L"";
+        // LPWSTR npcName = const_cast<LPWSTR>(L"");
         _asm {
-             mov ecx, NpcRealStruct
-             mov eax, GetNameFunc
+             mov ecx, npcRealStruct
+             mov eax, getNameFunc
              call eax
-             mov NpcName, eax
+             mov npcName, eax
         }
-        str.Format(L"NPCID为: %d Name: %s\r\n", NPCID, NpcName);
+        // group 2不可攻击 9可以攻击
+        DWORD group = GetNpcGroup(npcRealStruct);
+        if (group == 9) {
+            m_content.Append(L"可攻击对象");
+        }
+        str.Format(L"NPCID为: %d(%X) Name: %s\r\n", npcId, npcId, npcName);
         m_content.Append(str);
         // PrintCString(str);
     }

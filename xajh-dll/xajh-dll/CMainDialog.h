@@ -8,8 +8,10 @@
 #include <io.h>
 #include <fcntl.h>
 #include <atlconv.h>  // 包含ATL的转换宏
-
-
+#include "game-call.h"
+#include "attack-monster.h"
+#include "auto-attack.h"
+#include "Zydis/Zydis.h"
 // CMainDialog 对话框
 
 class CMainDialog : public CDialogEx {
@@ -20,7 +22,7 @@ class CMainDialog : public CDialogEx {
     virtual ~CMainDialog();
 
     virtual BOOL OnInitDialog();
-    
+
     void MakeWindowTopMost();
 
 
@@ -35,8 +37,13 @@ class CMainDialog : public CDialogEx {
     DECLARE_MESSAGE_MAP()
    public:
     CString m_content;
+    CButton m_autoAttack;
+    CButton m_setMainThreadMsg;
     afx_msg void OnBnClickedBagList();
     afx_msg void OnBnClickedSpeak();
     afx_msg void OnBnClickedAroundNPC();
     afx_msg void OnBnClickedWxList();
+    afx_msg void OnBnClickedAutoAttack();
+    afx_msg void OnBnClickedHookMainThreadMsg();
+    afx_msg void OnBnClickedButton5();
 };

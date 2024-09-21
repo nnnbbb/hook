@@ -1,36 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="资源文件">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{33a62833-01d1-4498-a3df-69f5a8e68bbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Header Files">
+      <UniqueIdentifier>{c16abebb-3ad6-4f50-9f1f-31a395b0d8b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\Source Files">
+      <UniqueIdentifier>{506c83cd-a264-4c9d-94a0-a0fd29d66f58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library Files">
+      <UniqueIdentifier>{2fb4df14-7a62-4c4e-b9b5-de0ce1a2569a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files\sdk">
+      <UniqueIdentifier>{e4e6a76b-b463-4675-93eb-ad7e082bf7c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk\Zydis">
+      <UniqueIdentifier>{a8b40531-5d5f-4ec4-bcbe-d498d6daa351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk\Zydis\Generated">
+      <UniqueIdentifier>{68f48dca-1bf6-45b3-ae14-8ee028a6dd14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sdk\Zydis\Internal">
+      <UniqueIdentifier>{45f4d692-3a4a-4177-ba12-fd72ad0e3b87}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xajh-dll.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CMainDialog.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="log.hpp">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="auto-attack.cpp">
+      <Filter>Game\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="attack-monster.cpp">
+      <Filter>Game\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game-call.cpp">
+      <Filter>Game\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="xajh-dll.def">
-      <Filter>源文件</Filter>
+      <Filter>Source Files</Filter>
     </None>
     <None Include="res\xajh-dll.rc2">
       <Filter>资源文件</Filter>
@@ -38,27 +71,128 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="xajh-dll.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CMainDialog.h">
-      <Filter>头文件</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="auto-attack.h">
+      <Filter>Game\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="attack-monster.h">
+      <Filter>Game\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game-call.h">
+      <Filter>Game\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Decoder.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\DecoderTypes.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Defines.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Disassembler.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Encoder.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Formatter.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\FormatterBuffer.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\MetaInfo.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Mnemonic.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Register.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Segment.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\SharedTypes.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\ShortString.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Status.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Utils.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Zydis.h">
+      <Filter>Header Files\sdk\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Generated\EnumInstructionCategory.h">
+      <Filter>Header Files\sdk\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Generated\EnumISAExt.h">
+      <Filter>Header Files\sdk\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Generated\EnumISASet.h">
+      <Filter>Header Files\sdk\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Generated\EnumMnemonic.h">
+      <Filter>Header Files\sdk\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Generated\EnumRegister.h">
+      <Filter>Header Files\sdk\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\DecoderData.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\EncoderData.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\FormatterATT.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\FormatterBase.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\FormatterIntel.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\SharedData.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="sdk\Zydis\Internal\String.h">
+      <Filter>Header Files\sdk\Zydis\Internal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xajh-dll.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="sdk\Zydis\Zydis_x64.lib">
+      <Filter>Library Files</Filter>
+    </Library>
+    <Library Include="sdk\Zydis\Zydis_x86.lib">
+      <Filter>Library Files</Filter>
+    </Library>
   </ItemGroup>
 </Project>

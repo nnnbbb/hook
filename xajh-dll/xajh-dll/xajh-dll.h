@@ -8,9 +8,7 @@
 #endif
 
 #include "resource.h"  // 主符号
-#include "log.hpp"
-#include <Zydis/Zydis.h>
-#include <inttypes.h>
+
 
 // CxajhdllApp
 // 有关此类实现的信息，请参阅 xajh-dll.cpp

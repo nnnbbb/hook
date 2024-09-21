@@ -37,7 +37,7 @@ void log(Args... args) {
 
     std::string path = fs::current_path().string() + "/log.txt";
     // Write to log file
-    std::ofstream file(path, std::ios_base::app | std::ios::out);  // ��utf-8�����ʽ���ļ�
+    std::ofstream file(path, std::ios_base::app | std::ios::out);
     if (file.is_open()) {
         file << dt << " ";
         int _[] = {0, ((_print(args), file << args << " "), 0)...};

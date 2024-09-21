@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -254,7 +255,10 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="attack-monster.cpp" />
+    <ClCompile Include="auto-attack.cpp" />
     <ClCompile Include="CMainDialog.cpp" />
+    <ClCompile Include="game-call.cpp" />
     <ClCompile Include="log.hpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -269,12 +273,57 @@
     <None Include="xajh-dll.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="attack-monster.h" />
+    <ClInclude Include="auto-attack.h" />
     <ClInclude Include="CMainDialog.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="game-call.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="sdk\Zydis\Decoder.h" />
+    <ClInclude Include="sdk\Zydis\DecoderTypes.h" />
+    <ClInclude Include="sdk\Zydis\Defines.h" />
+    <ClInclude Include="sdk\Zydis\Disassembler.h" />
+    <ClInclude Include="sdk\Zydis\Encoder.h" />
+    <ClInclude Include="sdk\Zydis\Formatter.h" />
+    <ClInclude Include="sdk\Zydis\FormatterBuffer.h" />
+    <ClInclude Include="sdk\Zydis\Generated\EnumInstructionCategory.h" />
+    <ClInclude Include="sdk\Zydis\Generated\EnumISAExt.h" />
+    <ClInclude Include="sdk\Zydis\Generated\EnumISASet.h" />
+    <ClInclude Include="sdk\Zydis\Generated\EnumMnemonic.h" />
+    <ClInclude Include="sdk\Zydis\Generated\EnumRegister.h" />
+    <ClInclude Include="sdk\Zydis\Internal\DecoderData.h" />
+    <ClInclude Include="sdk\Zydis\Internal\EncoderData.h" />
+    <ClInclude Include="sdk\Zydis\Internal\FormatterATT.h" />
+    <ClInclude Include="sdk\Zydis\Internal\FormatterBase.h" />
+    <ClInclude Include="sdk\Zydis\Internal\FormatterIntel.h" />
+    <ClInclude Include="sdk\Zydis\Internal\SharedData.h" />
+    <ClInclude Include="sdk\Zydis\Internal\String.h" />
+    <ClInclude Include="sdk\Zydis\MetaInfo.h" />
+    <ClInclude Include="sdk\Zydis\Mnemonic.h" />
+    <ClInclude Include="sdk\Zydis\Register.h" />
+    <ClInclude Include="sdk\Zydis\Segment.h" />
+    <ClInclude Include="sdk\Zydis\SharedTypes.h" />
+    <ClInclude Include="sdk\Zydis\ShortString.h" />
+    <ClInclude Include="sdk\Zydis\Status.h" />
+    <ClInclude Include="sdk\Zydis\Utils.h" />
+    <ClInclude Include="sdk\Zydis\Zydis.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="xajh-dll.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="sdk\Zydis\Zydis_x64.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </Library>
+    <Library Include="sdk\Zydis\Zydis_x86.lib">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Library>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xajh-dll.rc" />

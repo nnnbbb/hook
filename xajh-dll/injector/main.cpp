@@ -35,17 +35,39 @@ DWORD GetPidByName(const WCHAR* name) {
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    static HBRUSH hBrush = NULL;
+
     switch (uMsg) {
+        case WM_CREATE:
+            // 创建背景刷
+            hBrush = CreateSolidBrush(RGB(255, 255, 255));  // 白色背景
+            break;
+        case WM_CTLCOLORSTATIC: {
+            HDC hdcStatic = (HDC)wParam;
+            SetTextColor(hdcStatic, RGB(0, 0, 0));      // 黑色文字
+            SetBkColor(hdcStatic, RGB(255, 255, 255));  // 白色背景
+            return (INT_PTR)hBrush;
+        }
         case WM_TIMER:
             // 关闭窗口
             DestroyWindow(hwnd);
-            return 0;
+            break;
         case WM_CLOSE:
             DestroyWindow(hwnd);
-            return 0;
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            // 删除背景刷
+            if (hBrush) {
+                DeleteObject(hBrush);
+            }
+            break;
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
-    return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    return 0;
 }
+
 
 void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds) {
     // 创建一个简单的窗口类
@@ -60,10 +82,10 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
         0,
         L"AutoCloseMsgBoxClass",
         L"提示",
-        WS_OVERLAPPED | WS_CAPTION,  // 使用WS_OVERLAPPED样式并不包括WS_SYSMENU样式
+        WS_OVERLAPPED | WS_CAPTION,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        300,
+        150,
         100,
         NULL,
         NULL,
@@ -72,18 +94,61 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
     );
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-    // 创建一个静态文本控件来显示消息
+    // 创建静态文本控件来显示消息
     HWND hStatic = CreateWindowEx(
         0,
         L"STATIC",
         message.c_str(),
         WS_VISIBLE | WS_CHILD,
-        10, 10, 280, 40,
+        0, 0, 0, 0,  // 暂时设置位置和尺寸为0
         hwnd,
         NULL,
         GetModuleHandle(NULL),
         NULL
     );
+
+    // 设置静态文本控件的字体为 CodeNewRoman Nerd Font Mono
+    HFONT hFont = CreateFont(
+        18,                             // 字体高度
+        0,                              // 字体宽度
+        0,                              // 字体倾斜角度
+        0,                              // 字体倾斜方向
+        FW_NORMAL,                      // 字体重量
+        FALSE,                          // 斜体
+        FALSE,                          // 下划线
+        FALSE,                          // 删除线
+        DEFAULT_CHARSET,                // 字符集
+        OUT_PS_ONLY_PRECIS,             // 输出精度
+        CLIP_STROKE_PRECIS,             // 剪辑精度
+        PROOF_QUALITY,                  // 输出质量
+        DEFAULT_PITCH | FF_SWISS,       // 字体类别
+        L"CodeNewRoman Nerd Font Mono"  // 字体名称
+    );
+
+    SendMessage(hStatic, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+    // 计算文本的实际尺寸
+    HDC hdc = GetDC(hStatic);
+    SelectObject(hdc, hFont);
+    RECT textRect = {0, 0, 0, 0};
+    DrawText(hdc, message.c_str(), -1, &textRect, DT_CALCRECT);
+    ReleaseDC(hStatic, hdc);
+
+    int textWidth = textRect.right - textRect.left;
+    int textHeight = textRect.bottom - textRect.top;
+
+    // 获取窗口客户区尺寸
+    RECT rect;
+    GetClientRect(hwnd, &rect);
+    int windowWidth = rect.right - rect.left;
+    int windowHeight = rect.bottom - rect.top;
+
+    // 计算静态文本控件的位置，使其居中
+    int staticX = (windowWidth - textWidth) / 2;
+    int staticY = (windowHeight - textHeight) / 2;
+
+    // 设置静态文本控件的位置和尺寸
+    SetWindowPos(hStatic, NULL, staticX, staticY, textWidth, textHeight, SWP_NOZORDER);
 
     // 设置定时器
     SetTimer(hwnd, 1, durationInSeconds * 1000, NULL);
@@ -100,7 +165,9 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
 
     // 清理
     KillTimer(hwnd, 1);
+    DeleteObject(hFont);  // 删除字体对象
 }
+
 
 void AutoCloseMessageBox(const std::wstring& message, int durationInSeconds = 5) {
     // 创建一个线程来显示MessageBox
@@ -192,15 +259,37 @@ void InjectDll(
     CloseHandle(remoteThread);
     CloseHandle(processId);
 }
+void GetSystemFonts() {
+    std::vector<std::wstring> fonts;
+
+    LOGFONT lf = {0};
+    lf.lfCharSet = DEFAULT_CHARSET;
+
+    HDC hdc = GetDC(NULL);
+    EnumFontFamiliesEx(
+        hdc,
+        &lf,
+        [](const LOGFONT* lpelfe, const TEXTMETRIC* lpntme, DWORD FontType, LPARAM lParam) -> int {
+            std::vector<std::wstring>* pFonts = reinterpret_cast<std::vector<std::wstring>*>(lParam);
+            pFonts->push_back(lpelfe->lfFaceName);
+            return 1;  // 继续枚举
+        },
+        reinterpret_cast<LPARAM>(&fonts), 0
+    );
+    ReleaseDC(NULL, hdc);
+
+    for (const auto& font : fonts) {
+        std::wcout << font << std::endl;
+    }
+}
 
 int main(int argc, char* argv[]) {
     if (argc >= 2) {
         CloseWindowByTitle(L"XAJH");
         return 0;
     }
-
     InjectDll(L"xajh.exe", "xajh.dll");
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(5500));
     return 0;
 }

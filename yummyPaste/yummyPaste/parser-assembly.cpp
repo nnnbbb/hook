@@ -161,6 +161,15 @@ std::string AddHexPrefixToHexNumber(const std::string& s) {
     std::regex hex_number_regex(R"(\b([0-9a-fA-F]+)\b)");
     return std::regex_replace(s, hex_number_regex, "0x$1");
 }
+// 提取并处理每一行的函数
+std::string ProcessLine(const std::string& line, SELECTIONDATA& sel) {
+    std::string s = line;
+    s = RemoveSegmentRegisters(s);
+    s = AddHexPrefixToHexNumber(s);
+
+    // 处理以 'j' 等需要计算偏移的指令
+    return ProcessJmp(s, sel);
+}
 
 // 处理输入的函数
 std::vector<std::string> ProcessInput(const std::string& input, SELECTIONDATA& sel) {
@@ -169,22 +178,14 @@ std::vector<std::string> ProcessInput(const std::string& input, SELECTIONDATA& s
     std::vector<std::string> str;
 
     while ((pos = temp.find("\r\n")) != std::string::npos) {
-        std::string s = temp.substr(0, pos);
-        s = RemoveSegmentRegisters(s);
-
-        // 处理以 'j' 等需要计算偏移的指令
-        std::string result = ProcessJmp(s, sel);
-        // dprintf("result = %s\n", result.c_str());
-
-        str.push_back(result);
+        std::string line = temp.substr(0, pos);
+        str.push_back(ProcessLine(line, sel));
         temp.erase(0, pos + 2);  // 移动到 "\r\n" 后面
     }
 
     // 检查是否还有剩余的字符串
     if (!temp.empty()) {
-        temp = RemoveSegmentRegisters(temp);
-        std::string result = ProcessJmp(temp, sel);
-        str.push_back(result);
+        str.push_back(ProcessLine(temp, sel));
     }
     return str;
 }
@@ -204,6 +205,17 @@ void TestProcessInput() {
         "mov ecx,dword ptr ds:[esi+112]",
         "or ecx,dword ptr ds:[esi+1C]",
         "mov ecx,1",
+        "fld dword ptr ss:[ebp+7D5]",
+        "mov dword ptr ss:[esp+14],edx",
+        "fstp dword ptr ss:[esp+24]",
+        "fld1 ",
+        "fcom dword ptr ss:[ebp+829]",
+        "fnstsw ax",
+        "test ah,5",
+        "jp xajh.A208B3",
+        "fld dword ptr ss:[ebp+829]",
+        "fstp dword ptr ss:[esp+18]",
+        "jmp A208B7"
     };
 
     for (const auto& s : str) {

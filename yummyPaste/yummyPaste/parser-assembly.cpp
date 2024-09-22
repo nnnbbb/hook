@@ -50,6 +50,23 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
     return str;
 }
 
+// 去除字符串前后的空格
+std::string trim(const std::string& str) {
+    size_t start = str.find_first_not_of(" \t\n\r");
+    size_t end = str.find_last_not_of(" \t\n\r");
+
+    if (start == std::string::npos || end == std::string::npos) {
+        return "";
+    }
+
+    return str.substr(start, end - start + 1);
+}
+
+std::string AddHexPrefixToHexNumber(const std::string& s) {
+    std::regex hex_number_regex(R"(\b([0-9a-fA-F]+)\b)");
+    return std::regex_replace(s, hex_number_regex, "0x$1");
+}
+
 std::string RemoveSegmentRegisters(const std::string& input) {
     std::string result = input;
     result = ReplaceAll(result, "ss:", "");
@@ -60,7 +77,7 @@ std::string RemoveSegmentRegisters(const std::string& input) {
     return result;
 }
 
-constexpr char validStartChars[] = {'j', 'c', 'm', 'o'};
+constexpr char validStartChars[] = {'j', 'c'};
 bool ValidStartChar(char c) {
     return std::find(std::begin(validStartChars), std::end(validStartChars), c) != std::end(validStartChars);
 }
@@ -76,28 +93,33 @@ std::string ProcessHexNumber(const std::string& token) {
     return AddHexPrefixToHexNumber(modifiedToken);
 }
 
-std::variant<std::string, int> ProcessToken(const std::string& token, int start) {
+std::vector<std::string> ProcessToken(std::vector<std::string>& tokens, int start) {
     try {
-        std::string modifiedToken = ProcessHexNumber(token);
-        // 将元素转换为数字
-        int originalNumber = std::stoi(modifiedToken, nullptr, 0);  // 支持十六进制转换
-        int offsetNumber = originalNumber - start;
-
-        return offsetNumber;
+        std::string firstToken = tokens[0];
+        auto v = ValidStartChar(firstToken.c_str()[0]);
+        // jmp call 指令需要计算偏移
+        std::string modifiedToken = ProcessHexNumber(tokens[1]);
+        printf("modifiedToken -> %s\n", modifiedToken.c_str());
+        if (v == true) {
+            // 将元素转换为数字
+            int originalNumber = std::stoi(modifiedToken, nullptr, 0);  // 支持十六进制转换
+            int offsetNumber = originalNumber - start;
+            std::stringstream ss;
+            ss << std::hex << std::showbase << offsetNumber;
+            tokens[1] = ss.str();
+        }
+        return tokens;
 
     } catch (const std::invalid_argument& e) {
         dprintf("Invalid argument exception: %s\n", e.what());  // 输出异常信息到标准错误
-        return token;                                           // 如果转换失败，返回原字符串
+        return tokens;                                          // 如果转换失败，返回原字符串
     } catch (const std::out_of_range& e) {
         dprintf("Out of range exception: %s\n", e.what());  // 输出异常信息到标准错误
-        return token;                                       // 如果数字超出范围，返回原字符串
+        return tokens;                                      // 如果数字超出范围，返回原字符串
     }
 }
 
 std::string ProcessJmp(std::string& s, const SELECTIONDATA& sel) {
-    // if (s.empty() || !ValidStartChar(s[0])) {
-    //     return s;
-    // }
     std::vector<std::string> tokens;
     size_t startPos = 0;
 
@@ -119,53 +141,44 @@ std::string ProcessJmp(std::string& s, const SELECTIONDATA& sel) {
         return s;  // 如果没有第二个元素，返回原字符串
     }
 
-    std::string& firstToken = tokens[0];
+    std::string& secondToken = tokens[1];
 
     std::string newString;
-    if (tokens[1].find(',') == std::string::npos) {
-        std::string& secondToken = tokens[1];
-        auto result = ProcessToken(secondToken, sel.start);
-        if (std::holds_alternative<int>(result)) {
-            std::stringstream ss;
-            ss << std::hex << std::showbase << std::get<int>(result);
-            tokens[1] = ss.str();
-        }
-        newString = tokens[0] + " " + tokens[1];
+    if (secondToken.find(',') == std::string::npos) {
+        auto result = ProcessToken(tokens, sel.start);
+        newString = tokens[0] + " " + ProcessHexNumber(tokens[1]);
     } else {
         size_t pos = 0;
         size_t comma = tokens[1].find_first_of(',', pos);
-        std::vector<std::string> movTokens;
-        movTokens.push_back(tokens[0]);
+        std::vector<std::string> secondTokens;
+        secondTokens.push_back(tokens[0]);
+
 
         if (comma != std::string::npos) {
             // 提取指令
-            movTokens.push_back(tokens[1].substr(pos, comma));
+            secondTokens.push_back(tokens[1].substr(pos, comma));
             pos = comma + 1;  // 跳过空格
 
             // 提取后续内容，允许空格
-            movTokens.push_back(tokens[1].substr(pos));
+            secondTokens.push_back(tokens[1].substr(pos));
         }
 
-        if (movTokens.size() < 3) {
+        if (secondTokens.size() < 3) {
             return s;
         }
 
-        std::string& lastToken = movTokens[2];
-        newString = movTokens[0] + " " + ProcessHexNumber(movTokens[1]) + ", " + ProcessHexNumber(lastToken);
+        std::string& lastToken = secondTokens[2];
+        newString = secondTokens[0] + " " + ProcessHexNumber(secondTokens[1]) + ", " + ProcessHexNumber(lastToken);
     }
     return newString;
 }
 
 
-std::string AddHexPrefixToHexNumber(const std::string& s) {
-    std::regex hex_number_regex(R"(\b([0-9a-fA-F]+)\b)");
-    return std::regex_replace(s, hex_number_regex, "0x$1");
-}
 // 提取并处理每一行的函数
 std::string ProcessLine(const std::string& line, SELECTIONDATA& sel) {
     std::string s = line;
+    s = trim(s);
     s = RemoveSegmentRegisters(s);
-    s = AddHexPrefixToHexNumber(s);
 
     // 处理以 'j' 等需要计算偏移的指令
     return ProcessJmp(s, sel);
@@ -215,6 +228,7 @@ void TestProcessInput() {
         "jp xajh.A208B3",
         "fld dword ptr ss:[ebp+829]",
         "fstp dword ptr ss:[esp+18]",
+        "push 0",
         "jmp A208B7"
     };
 

@@ -253,4 +253,5 @@ void pluginSetup() {
     _plugin_menuaddentry(hMenuDump, MENU_DUMP_PASTE_PATCH, "Paste and Patch");
     _plugin_menuaddentry(hMenuDump, MENU_DUMP_PASTE_ASSEBLY, "Paste assembly");
     _plugin_menuaddentry(hMenuDump, MENU_DUMP_ABOUT, "A&bout");
+    // TestProcessInput();
 }

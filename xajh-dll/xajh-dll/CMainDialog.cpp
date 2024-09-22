@@ -60,6 +60,7 @@ ON_BN_CLICKED(IDC_BUTTON4, &CMainDialog::OnBnClickedWxList)
 ON_BN_CLICKED(IDC_CHECK1, &CMainDialog::OnBnClickedAutoAttack)
 ON_BN_CLICKED(IDC_CHECK_MSG, &CMainDialog::OnBnClickedHookMainThreadMsg)
 ON_BN_CLICKED(IDC_BUTTON5, &CMainDialog::OnBnClickedButton5)
+ON_BN_CLICKED(IDC_BUTTON6, &CMainDialog::OnBnClickedFindWay)
 END_MESSAGE_MAP()
 
 
@@ -371,4 +372,42 @@ void CMainDialog::OnBnClickedButton5() {
     NOT_NULL(eventHandle);
     WaitForSingleObject(eventHandle, 3000);
     CloseHandle(eventHandle);
+}
+
+
+void CMainDialog::OnBnClickedFindWay() {
+    typedef struct _CORRDINATES {
+        float x;
+        float z;
+        float y;
+    } CORRDINATES, *PCORRDINATES;
+
+    CORRDINATES coordinates = {};
+    coordinates.x = -150.0;
+    coordinates.y = 50.0;
+    coordinates.z = 0;
+    _asm {
+        push 0
+        push 1
+        push 0x3F4CCCCD
+        push 0
+
+        // ×ø±ê
+        lea eax, coordinates
+        push eax;
+
+        // ecx
+        mov eax, 0x4AEFA0
+        call eax
+        mov ecx, dword ptr ds:[eax+0x274]
+
+        // µØÍ¼id
+        push 0x44 
+        push 0
+        push 0
+        push 0
+        push 0
+        mov eax, 0x730500
+        call eax
+    }
 }

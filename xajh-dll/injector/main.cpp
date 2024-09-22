@@ -81,7 +81,7 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
     HWND hwnd = CreateWindowEx(
         0,
         L"AutoCloseMsgBoxClass",
-        L"ÌבÊ¾",
+        L"",
         WS_OVERLAPPED | WS_CAPTION,
         CW_USEDEFAULT,
         CW_USEDEFAULT,

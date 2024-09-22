@@ -46,4 +46,5 @@ class CMainDialog : public CDialogEx {
     afx_msg void OnBnClickedAutoAttack();
     afx_msg void OnBnClickedHookMainThreadMsg();
     afx_msg void OnBnClickedButton5();
+    afx_msg void OnBnClickedFindWay();
 };

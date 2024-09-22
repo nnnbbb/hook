@@ -1,4 +1,4 @@
-#include <Windows.h>
+ï»¿#include <Windows.h>
 #include "iostream"
 #include <string>
 #include <iostream>
@@ -14,7 +14,7 @@
 
 #include <experimental/filesystem>
 
-// ¸ù¾İ½ø³ÌÃûµÃµ½½ø³ÌPID
+// æ ¹æ®è¿›ç¨‹åå¾—åˆ°è¿›ç¨‹PID
 DWORD GetPidByName(const WCHAR* name) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 pe32 = {sizeof(PROCESSENTRY32)};
@@ -39,17 +39,17 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
     switch (uMsg) {
         case WM_CREATE:
-            // ´´½¨±³¾°Ë¢
-            hBrush = CreateSolidBrush(RGB(255, 255, 255));  // °×É«±³¾°
+            // åˆ›å»ºèƒŒæ™¯åˆ·
+            hBrush = CreateSolidBrush(RGB(255, 255, 255));  // ç™½è‰²èƒŒæ™¯
             break;
         case WM_CTLCOLORSTATIC: {
             HDC hdcStatic = (HDC)wParam;
-            SetTextColor(hdcStatic, RGB(0, 0, 0));      // ºÚÉ«ÎÄ×Ö
-            SetBkColor(hdcStatic, RGB(255, 255, 255));  // °×É«±³¾°
+            SetTextColor(hdcStatic, RGB(0, 0, 0));      // é»‘è‰²æ–‡å­—
+            SetBkColor(hdcStatic, RGB(255, 255, 255));  // ç™½è‰²èƒŒæ™¯
             return (INT_PTR)hBrush;
         }
         case WM_TIMER:
-            // ¹Ø±Õ´°¿Ú
+            // å…³é—­çª—å£
             DestroyWindow(hwnd);
             break;
         case WM_CLOSE:
@@ -57,7 +57,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             break;
         case WM_DESTROY:
             PostQuitMessage(0);
-            // É¾³ı±³¾°Ë¢
+            // åˆ é™¤èƒŒæ™¯åˆ·
             if (hBrush) {
                 DeleteObject(hBrush);
             }
@@ -70,14 +70,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 
 void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds) {
-    // ´´½¨Ò»¸ö¼òµ¥µÄ´°¿ÚÀà
+    // åˆ›å»ºä¸€ä¸ªç®€å•çš„çª—å£ç±»
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = GetModuleHandle(NULL);
     wc.lpszClassName = L"AutoCloseMsgBoxClass";
     RegisterClass(&wc);
 
-    // ´´½¨Ò»¸ö´°¿Ú
+    // åˆ›å»ºä¸€ä¸ªçª—å£
     HWND hwnd = CreateWindowEx(
         0,
         L"AutoCloseMsgBoxClass",
@@ -94,40 +94,40 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
     );
     SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-    // ´´½¨¾²Ì¬ÎÄ±¾¿Ø¼şÀ´ÏÔÊ¾ÏûÏ¢
+    // åˆ›å»ºé™æ€æ–‡æœ¬æ§ä»¶æ¥æ˜¾ç¤ºæ¶ˆæ¯
     HWND hStatic = CreateWindowEx(
         0,
         L"STATIC",
         message.c_str(),
         WS_VISIBLE | WS_CHILD,
-        0, 0, 0, 0,  // ÔİÊ±ÉèÖÃÎ»ÖÃºÍ³ß´çÎª0
+        0, 0, 0, 0,  // æš‚æ—¶è®¾ç½®ä½ç½®å’Œå°ºå¯¸ä¸º0
         hwnd,
         NULL,
         GetModuleHandle(NULL),
         NULL
     );
 
-    // ÉèÖÃ¾²Ì¬ÎÄ±¾¿Ø¼şµÄ×ÖÌåÎª CodeNewRoman Nerd Font Mono
+    // è®¾ç½®é™æ€æ–‡æœ¬æ§ä»¶çš„å­—ä½“ä¸º CodeNewRoman Nerd Font Mono
     HFONT hFont = CreateFont(
-        18,                             // ×ÖÌå¸ß¶È
-        0,                              // ×ÖÌå¿í¶È
-        0,                              // ×ÖÌåÇãĞ±½Ç¶È
-        0,                              // ×ÖÌåÇãĞ±·½Ïò
-        FW_NORMAL,                      // ×ÖÌåÖØÁ¿
-        FALSE,                          // Ğ±Ìå
-        FALSE,                          // ÏÂ»®Ïß
-        FALSE,                          // É¾³ıÏß
-        DEFAULT_CHARSET,                // ×Ö·û¼¯
-        OUT_PS_ONLY_PRECIS,             // Êä³ö¾«¶È
-        CLIP_STROKE_PRECIS,             // ¼ô¼­¾«¶È
-        PROOF_QUALITY,                  // Êä³öÖÊÁ¿
-        DEFAULT_PITCH | FF_SWISS,       // ×ÖÌåÀà±ğ
-        L"CodeNewRoman Nerd Font Mono"  // ×ÖÌåÃû³Æ
+        18,                             // å­—ä½“é«˜åº¦
+        0,                              // å­—ä½“å®½åº¦
+        0,                              // å­—ä½“å€¾æ–œè§’åº¦
+        0,                              // å­—ä½“å€¾æ–œæ–¹å‘
+        FW_NORMAL,                      // å­—ä½“é‡é‡
+        FALSE,                          // æ–œä½“
+        FALSE,                          // ä¸‹åˆ’çº¿
+        FALSE,                          // åˆ é™¤çº¿
+        DEFAULT_CHARSET,                // å­—ç¬¦é›†
+        OUT_PS_ONLY_PRECIS,             // è¾“å‡ºç²¾åº¦
+        CLIP_STROKE_PRECIS,             // å‰ªè¾‘ç²¾åº¦
+        PROOF_QUALITY,                  // è¾“å‡ºè´¨é‡
+        DEFAULT_PITCH | FF_SWISS,       // å­—ä½“ç±»åˆ«
+        L"CodeNewRoman Nerd Font Mono"  // å­—ä½“åç§°
     );
 
     SendMessage(hStatic, WM_SETFONT, (WPARAM)hFont, TRUE);
 
-    // ¼ÆËãÎÄ±¾µÄÊµ¼Ê³ß´ç
+    // è®¡ç®—æ–‡æœ¬çš„å®é™…å°ºå¯¸
     HDC hdc = GetDC(hStatic);
     SelectObject(hdc, hFont);
     RECT textRect = {0, 0, 0, 0};
@@ -137,43 +137,43 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
     int textWidth = textRect.right - textRect.left;
     int textHeight = textRect.bottom - textRect.top;
 
-    // »ñÈ¡´°¿Ú¿Í»§Çø³ß´ç
+    // è·å–çª—å£å®¢æˆ·åŒºå°ºå¯¸
     RECT rect;
     GetClientRect(hwnd, &rect);
     int windowWidth = rect.right - rect.left;
     int windowHeight = rect.bottom - rect.top;
 
-    // ¼ÆËã¾²Ì¬ÎÄ±¾¿Ø¼şµÄÎ»ÖÃ£¬Ê¹Æä¾ÓÖĞ
+    // è®¡ç®—é™æ€æ–‡æœ¬æ§ä»¶çš„ä½ç½®ï¼Œä½¿å…¶å±…ä¸­
     int staticX = (windowWidth - textWidth) / 2;
     int staticY = (windowHeight - textHeight) / 2;
 
-    // ÉèÖÃ¾²Ì¬ÎÄ±¾¿Ø¼şµÄÎ»ÖÃºÍ³ß´ç
+    // è®¾ç½®é™æ€æ–‡æœ¬æ§ä»¶çš„ä½ç½®å’Œå°ºå¯¸
     SetWindowPos(hStatic, NULL, staticX, staticY, textWidth, textHeight, SWP_NOZORDER);
 
-    // ÉèÖÃ¶¨Ê±Æ÷
+    // è®¾ç½®å®šæ—¶å™¨
     SetTimer(hwnd, 1, durationInSeconds * 1000, NULL);
 
-    // ÏÔÊ¾´°¿Ú
+    // æ˜¾ç¤ºçª—å£
     ShowWindow(hwnd, SW_SHOW);
 
-    // ½øÈëÏûÏ¢Ñ­»·£¬µÈ´ıWM_CLOSEÏûÏ¢
+    // è¿›å…¥æ¶ˆæ¯å¾ªç¯ï¼Œç­‰å¾…WM_CLOSEæ¶ˆæ¯
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 
-    // ÇåÀí
+    // æ¸…ç†
     KillTimer(hwnd, 1);
-    DeleteObject(hFont);  // É¾³ı×ÖÌå¶ÔÏó
+    DeleteObject(hFont);  // åˆ é™¤å­—ä½“å¯¹è±¡
 }
 
 
 void AutoCloseMessageBox(const std::wstring& message, int durationInSeconds = 5) {
-    // ´´½¨Ò»¸öÏß³ÌÀ´ÏÔÊ¾MessageBox
+    // åˆ›å»ºä¸€ä¸ªçº¿ç¨‹æ¥æ˜¾ç¤ºMessageBox
     std::thread([message, durationInSeconds]() {
         ShowAutoCloseMessageBox(message, durationInSeconds);
-    }).detach();  // ·ÖÀëÏß³Ì£¬ÔÊĞíÆä¶ÀÁ¢ÔËĞĞ
+    }).detach();  // åˆ†ç¦»çº¿ç¨‹ï¼Œå…è®¸å…¶ç‹¬ç«‹è¿è¡Œ
 }
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
@@ -182,10 +182,10 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 
     if (std::wstring(title) == reinterpret_cast<LPCWSTR>(lParam)) {
         SendMessage(hwnd, WM_CLOSE, 0, 0);
-        return FALSE;  // ÕÒµ½ÌØ¶¨±êÌâµÄ´°¿Úºó¹Ø±Õ²¢·µ»ØFALSE£¬ÖÕÖ¹Ã¶¾Ù
+        return FALSE;  // æ‰¾åˆ°ç‰¹å®šæ ‡é¢˜çš„çª—å£åå…³é—­å¹¶è¿”å›FALSEï¼Œç»ˆæ­¢æšä¸¾
     }
 
-    return TRUE;  // ¼ÌĞøÃ¶¾Ù´°¿Ú
+    return TRUE;  // ç»§ç»­æšä¸¾çª—å£
 }
 
 void CloseWindowByTitle(const std::wstring& windowTitle) {
@@ -200,7 +200,7 @@ std::string GetCurrentExecutableDirectory() {
 
     return directory;
 }
-// Æ´½ÓÂ·¾¶ºÍÎÄ¼şÃû
+// æ‹¼æ¥è·¯å¾„å’Œæ–‡ä»¶å
 std::string PathJoin(const std::string& path, const std::string& fileName) {
     if (path.empty() || path.back() == '\\' || path.back() == '/') {
         return path + fileName;
@@ -212,14 +212,14 @@ std::string PathJoin(const std::string& path, const std::string& fileName) {
 void InjectDll(
     const std::wstring& processName,
     const std::string& dllName,
-    const std::wstring& successMessage = L"×¢Èë³É¹¦"
+    const std::wstring& successMessage = L"æ³¨å…¥æˆåŠŸ"
 ) {
     DWORD pid = GetPidByName(processName.c_str());
 
     HANDLE processId = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 
     if (processId == 0) {
-        AutoCloseMessageBox(L"´ò¿ª½ø³ÌÊ§°Ü£¡");
+        AutoCloseMessageBox(L"æ‰“å¼€è¿›ç¨‹å¤±è´¥ï¼");
         system("pause");
         return;
     }
@@ -230,13 +230,13 @@ void InjectDll(
     int dllLen = dllPath.length();
     LPVOID buffer = VirtualAllocEx(processId, 0, dllLen, MEM_COMMIT, PAGE_READWRITE);
     if (buffer == NULL) {
-        AutoCloseMessageBox(L"ÉêÇëÄÚ´æÊ§°Ü£¡");
+        AutoCloseMessageBox(L"ç”³è¯·å†…å­˜å¤±è´¥ï¼");
         return;
     }
 
     BOOL Success = WriteProcessMemory(processId, buffer, dllPath.c_str(), dllLen, NULL);
     if (Success == FALSE) {
-        AutoCloseMessageBox(L"Ğ´ÈëÄÚ´æÊ§°Ü£¡");
+        AutoCloseMessageBox(L"å†™å…¥å†…å­˜å¤±è´¥ï¼");
         return;
     }
 
@@ -247,7 +247,7 @@ void InjectDll(
     );
 
     if (remoteThread == NULL) {
-        AutoCloseMessageBox(L"´´½¨Ô¶³ÌÏß³ÌÊ§°Ü£¡");
+        AutoCloseMessageBox(L"åˆ›å»ºè¿œç¨‹çº¿ç¨‹å¤±è´¥ï¼");
         return;
     }
 
@@ -272,7 +272,7 @@ void GetSystemFonts() {
         [](const LOGFONT* lpelfe, const TEXTMETRIC* lpntme, DWORD FontType, LPARAM lParam) -> int {
             std::vector<std::wstring>* pFonts = reinterpret_cast<std::vector<std::wstring>*>(lParam);
             pFonts->push_back(lpelfe->lfFaceName);
-            return 1;  // ¼ÌĞøÃ¶¾Ù
+            return 1;  // ç»§ç»­æšä¸¾
         },
         reinterpret_cast<LPARAM>(&fonts), 0
     );

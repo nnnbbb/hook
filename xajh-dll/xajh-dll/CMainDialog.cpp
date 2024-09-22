@@ -1,4 +1,4 @@
-// CMainDialog.cpp: ÊµÏÖÎÄ¼ş
+ï»¿// CMainDialog.cpp: å®ç°æ–‡ä»¶
 //
 
 #include "pch.h"
@@ -13,7 +13,7 @@
         }                                               \
     } while (0)
 
-// CMainDialog ¶Ô»°¿ò
+// CMainDialog å¯¹è¯æ¡†
 IMPLEMENT_DYNAMIC(CMainDialog, CDialogEx)
 
 CMainDialog::CMainDialog(CWnd* pParent /*=nullptr*/)
@@ -28,17 +28,17 @@ CMainDialog::~CMainDialog() {
 BOOL CMainDialog::OnInitDialog() {
     CDialogEx::OnInitDialog();
     // MakeWindowTopMost();
-    // ÉèÖÃ´°¿ÚµÄÎ»ÖÃºÍ´óĞ¡
-    int x = 1040;      // X×ø±ê
-    int y = 900;       // Y×ø±ê
-    int width = 600;   // ¿í¶È
-    int height = 400;  // ¸ß¶È
+    // è®¾ç½®çª—å£çš„ä½ç½®å’Œå¤§å°
+    int x = 1040;      // Xåæ ‡
+    int y = 900;       // Yåæ ‡
+    int width = 600;   // å®½åº¦
+    int height = 400;  // é«˜åº¦
     // SetWindowPos(NULL, x, y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
     MoveWindow(x, y, width, height);
     return TRUE;
 }
 
-// ´°¿ÚÖÃ¶¥
+// çª—å£ç½®é¡¶
 void CMainDialog::MakeWindowTopMost() {
     SetWindowPos(&wndTopMost, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 }
@@ -64,13 +64,13 @@ ON_BN_CLICKED(IDC_BUTTON6, &CMainDialog::OnBnClickedFindWay)
 END_MESSAGE_MAP()
 
 
-// CMainDialog ÏûÏ¢´¦Àí³ÌĞò
+// CMainDialog æ¶ˆæ¯å¤„ç†ç¨‹åº
 std::string WStringToString(const std::wstring& wstr) {
-    // ¼ÆËãËùĞèµÄ»º³åÇø´óĞ¡
+    // è®¡ç®—æ‰€éœ€çš„ç¼“å†²åŒºå¤§å°
     int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), nullptr, 0, nullptr, nullptr);
     std::string str(size_needed, 0);
 
-    // Ö´ĞĞ×ª»»
+    // æ‰§è¡Œè½¬æ¢
     WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), &str[0], size_needed, nullptr, nullptr);
 
     return str;
@@ -86,7 +86,7 @@ void GetGoodsName(DWORD GoodsId, wchar_t* utf16_str, int length) {
         lea   eax, Tmp
         push  eax
         push  0
-        push  GoodsId  // ÎïÆ·id
+        push  GoodsId  // ç‰©å“id
         mov eax, 0x00C4A660
         call eax
         add eax, 4
@@ -104,12 +104,12 @@ void PrintHex(const wchar_t* utf16_str, int length) {
     std::cout << std::endl;
 }
 
-// ÉèÖÃ¿ØÖÆÌ¨Êä³ö±àÂë
+// è®¾ç½®æ§åˆ¶å°è¾“å‡ºç¼–ç 
 void SetConsoleUTF8() {
     int res = _setmode(_fileno(stdout), _O_U8TEXT);
 }
 
-// »ñÈ¡¿ØÖÆÌ¨Êä³ö±àÂë
+// è·å–æ§åˆ¶å°è¾“å‡ºç¼–ç 
 void GetConsoleCodePage() {
     UINT codePage = GetConsoleOutputCP();
 
@@ -117,11 +117,11 @@ void GetConsoleCodePage() {
 }
 
 void PrintCString(const CString& cstr) {
-    // ½« CString ×ª»»Îª¶à×Ö½Ú×Ö·û¼¯ LPCSTR
+    // å°† CString è½¬æ¢ä¸ºå¤šå­—èŠ‚å­—ç¬¦é›† LPCSTR
     CStringA strA(cstr);
     LPCSTR str = strA;
 
-    // Ê¹ÓÃ printf Êä³ö×Ö·û´®
+    // ä½¿ç”¨ printf è¾“å‡ºå­—ç¬¦ä¸²
     printf("%s", str);
 }
 
@@ -140,7 +140,7 @@ void CMainDialog::OnBnClickedBagList() {
 
         GetGoodsName(Id, utf16_str, length);
 
-        // Êä³öutf16_strÊı×éµÄÄÚÈİ
+        // è¾“å‡ºutf16_stræ•°ç»„çš„å†…å®¹
         // std::wcout << L"UTF-16 String Content: " << std::endl;
         // GetGoodsName(0x14786, utf16_str, length);
         PrintHex(utf16_str, length);
@@ -162,10 +162,10 @@ void CMainDialog::OnBnClickedSpeak() {
     Speak(content);
 }
 
-// npcÕóÓª
+// npcé˜µè¥
 DWORD GetNpcGroup(DWORD npcStruct) {
     // [[[0x14C2050+24]+8C]+1A84]
-    // Êó±êÖ¸Õë
+    // é¼ æ ‡æŒ‡é’ˆ
     DWORD*** baseAddress = (DWORD***)(0x14C2050 + 0x24);
     DWORD mouseAddress = baseAddress[0][0x8C / 4][0x1A84 / 4];
 
@@ -176,12 +176,12 @@ DWORD GetNpcGroup(DWORD npcStruct) {
     DWORD group = 0;
 
     _asm {
-        push 0          ;  // ¹Ì¶¨0 
+        push 0          ;  // å›ºå®š0 
         lea  eax, tmp
-        push eax        ;  // ËæÒâ¾Ö²¿±äÁ¿
+        push eax        ;  // éšæ„å±€éƒ¨å˜é‡
 
-        push npcStruct  ;  // npc¶ÔÏó½á¹¹  +140ÊÇnpcid
-        push npcIdHigh  ;  // ¹Ì¶¨Öµ 0x01000000
+        push npcStruct  ;  // npcå¯¹è±¡ç»“æ„  +140æ˜¯npcid
+        push npcIdHigh  ;  // å›ºå®šå€¼ 0x01000000
         push npcIdLow   ;  // ipcid
         mov  ecx, mouseAddress
 
@@ -206,12 +206,12 @@ void CMainDialog::OnBnClickedAroundNPC() {
         if (npcStruct == 0) {
             continue;
         }
-        DWORD npcRealStruct = *(DWORD*)(npcStruct + 0x4);  // NPC½á¹¹ÌåÖ¸Õë
+        DWORD npcRealStruct = *(DWORD*)(npcStruct + 0x4);  // NPCç»“æ„ä½“æŒ‡é’ˆ
 
         DWORD npcId = *(DWORD*)(npcRealStruct + 0x140);
-        // »ñÈ¡Ğéº¯Êı±í
+        // è·å–è™šå‡½æ•°è¡¨
         DWORD virtua1FunTable = ((DWORD*)npcRealStruct)[0];
-        // »ñÈ¡¶ÔÏóº¯ÊıµØÖ·
+        // è·å–å¯¹è±¡å‡½æ•°åœ°å€
         DWORD getNameFunc = *(DWORD*)(virtua1FunTable + 0x88);
         const wchar_t* npcName = L"";
         // LPWSTR npcName = const_cast<LPWSTR>(L"");
@@ -221,12 +221,12 @@ void CMainDialog::OnBnClickedAroundNPC() {
              call eax
              mov npcName, eax
         }
-        // group 2²»¿É¹¥»÷ 9¿ÉÒÔ¹¥»÷
+        // group 2ä¸å¯æ”»å‡» 9å¯ä»¥æ”»å‡»
         DWORD group = GetNpcGroup(npcRealStruct);
         if (group == 9) {
-            m_content.Append(L"¿É¹¥»÷¶ÔÏó");
+            m_content.Append(L"å¯æ”»å‡»å¯¹è±¡");
         }
-        str.Format(L"NPCIDÎª: %d(%X) Name: %s\r\n", npcId, npcId, npcName);
+        str.Format(L"NPCIDä¸º: %d(%X) Name: %s\r\n", npcId, npcId, npcName);
         m_content.Append(str);
         // PrintCString(str);
     }
@@ -267,7 +267,7 @@ void CMainDialog::OnBnClickedWxList() {
         mov mpObj, eax;
     }
     CString str;
-    // ÎäÑ§ÁĞ±í
+    // æ­¦å­¦åˆ—è¡¨
     DWORD wxArrary = mpObj + 0x620;
     for (size_t i = 0; i < 5; i++) {
         DWORD wxAddress = wxArrary + i * 4;
@@ -306,7 +306,7 @@ void CMainDialog::OnBnClickedWxList() {
             if (skillId != 0) {
                 DWORD skillName = GetSkillName(skillId);
                 str.Format(L"wxName = %s ", (wchar_t*)wxName);
-                str.Format(L"skillName = %s, µ±Ç°ÎäÑ§¼¼ÄÜIDÎª:%X\r\n", (wchar_t*)skillName, skillId);
+                str.Format(L"skillName = %s, å½“å‰æ­¦å­¦æŠ€èƒ½IDä¸º:%X\r\n", (wchar_t*)skillName, skillId);
                 m_content.Append(str);
             }
         }
@@ -321,7 +321,7 @@ void CMainDialog::OnBnClickedAutoAttack() {
     if (m_autoAttack.GetCheck()) {
         attackThreadHandle = ::CreateThread(NULL, 0, autoAttackThread, 0, 0, NULL);
     } else {
-        // Ê¹ÓÃ TerminateThread º¯ÊıÀ´Ç¿ÖÆÖÕÖ¹Ò»¸öÏß³Ì£¬µ«Õâ¸öº¯Êı»áÈÆ¹ıÏß³ÌµÄÇåÀí²Ù×÷£¬¿ÉÄÜµ¼ÖÂ×ÊÔ´Ğ¹Â©ºÍËÀËøµÈÎÊÌâ¡£
+        // ä½¿ç”¨ TerminateThread å‡½æ•°æ¥å¼ºåˆ¶ç»ˆæ­¢ä¸€ä¸ªçº¿ç¨‹ï¼Œä½†è¿™ä¸ªå‡½æ•°ä¼šç»•è¿‡çº¿ç¨‹çš„æ¸…ç†æ“ä½œï¼Œå¯èƒ½å¯¼è‡´èµ„æºæ³„æ¼å’Œæ­»é”ç­‰é—®é¢˜ã€‚
         TerminateThread(attackThreadHandle, 0);
         CloseHandle(attackThreadHandle);
     }
@@ -386,13 +386,13 @@ void CMainDialog::OnBnClickedFindWay() {
     coordinates.x = -150.0;
     coordinates.y = 50.0;
     coordinates.z = 0;
-    _asm {
+    _asm { 
         push 0
         push 1
         push 0x3F4CCCCD
         push 0
 
-        // ×ø±ê
+        // åæ ‡
         lea eax, coordinates
         push eax;
 
@@ -401,7 +401,7 @@ void CMainDialog::OnBnClickedFindWay() {
         call eax
         mov ecx, dword ptr ds:[eax+0x274]
 
-        // µØÍ¼id
+        // åœ°å›¾id
         push 0x44 
         push 0
         push 0

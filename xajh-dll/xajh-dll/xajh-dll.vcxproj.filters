@@ -60,6 +60,12 @@
     <ClCompile Include="game-call.cpp">
       <Filter>Game\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="hook-main-thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hot-key.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="xajh-dll.def">
@@ -180,6 +186,15 @@
     </ClInclude>
     <ClInclude Include="sdk\Zydis\Internal\String.h">
       <Filter>Header Files\sdk\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="hook-main-thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hot-key.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

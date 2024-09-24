@@ -44,8 +44,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
             break;
         case WM_CTLCOLORSTATIC: {
             HDC hdcStatic = (HDC)wParam;
-            SetTextColor(hdcStatic, RGB(0, 0, 0));      // 黑色文字
-            SetBkColor(hdcStatic, RGB(255, 255, 255));  // 白色背景
+            // 黑色文字
+            SetTextColor(hdcStatic, RGB(0, 0, 0));
+            // 白色背景
+            SetBkColor(hdcStatic, RGB(255, 255, 255));
+            // 窗口置顶
+            SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
             return (INT_PTR)hBrush;
         }
         case WM_TIMER:
@@ -62,8 +66,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
                 DeleteObject(hBrush);
             }
             break;
-        default:
+        default: {
             return DefWindowProc(hwnd, uMsg, wParam, lParam);
+        }
     }
     return 0;
 }
@@ -85,14 +90,13 @@ void ShowAutoCloseMessageBox(const std::wstring& message, int durationInSeconds)
         WS_OVERLAPPED | WS_CAPTION,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
-        150,
+        200,
         100,
         NULL,
         NULL,
         GetModuleHandle(NULL),
         NULL
     );
-    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
     // 创建静态文本控件来显示消息
     HWND hStatic = CreateWindowEx(

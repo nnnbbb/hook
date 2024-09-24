@@ -2,28 +2,19 @@
 //
 
 #include "pch.h"
-#include "xajh-dll.h"
+#include "resource.h"
 #include "CMainDialog.h"
 #include "afxdialogex.h"
-
-#define NOT_NULL(value)                                 \
-    do {                                                \
-        if (value == NULL) {                            \
-            throw std::runtime_error("Handle is NULL"); \
-        }                                               \
-    } while (0)
 
 // CMainDialog 对话框
 IMPLEMENT_DYNAMIC(CMainDialog, CDialogEx)
 
+
 CMainDialog::CMainDialog(CWnd* pParent /*=nullptr*/)
     : CDialogEx(IDD_DIALOG1, pParent), m_content(_T("")) {
 }
-
 CMainDialog::~CMainDialog() {
 }
-
-
 
 BOOL CMainDialog::OnInitDialog() {
     CDialogEx::OnInitDialog();
@@ -35,7 +26,22 @@ BOOL CMainDialog::OnInitDialog() {
     int height = 400;  // 高度
     // SetWindowPos(NULL, x, y, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
     MoveWindow(x, y, width, height);
+
+    HookMainThread();
+
+    InitHotKey(m_hWnd);
     return TRUE;
+}
+void CMainDialog::OnDestroy() {
+    CDialogEx::OnDestroy();
+    UnHookMainThread();
+    UnInitHotKey(m_hWnd);
+}
+
+void CMainDialog::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2) {
+    SetHotKey(nHotKeyId, nKey1, nKey2);
+
+    CDialogEx::OnHotKey(nHotKeyId, nKey1, nKey2);
 }
 
 // 窗口置顶
@@ -53,15 +59,38 @@ void CMainDialog::DoDataExchange(CDataExchange* pDX) {
 
 
 BEGIN_MESSAGE_MAP(CMainDialog, CDialogEx)
+// 添加 OnDestroy 消息映射
+ON_WM_DESTROY()
+// 添加热键消息映射
+ON_WM_HOTKEY()
 ON_BN_CLICKED(IDC_BUTTON1, &CMainDialog::OnBnClickedBagList)
 ON_BN_CLICKED(IDC_BUTTON2, &CMainDialog::OnBnClickedSpeak)
 ON_BN_CLICKED(IDC_BUTTON3, &CMainDialog::OnBnClickedAroundNPC)
 ON_BN_CLICKED(IDC_BUTTON4, &CMainDialog::OnBnClickedWxList)
 ON_BN_CLICKED(IDC_CHECK1, &CMainDialog::OnBnClickedAutoAttack)
 ON_BN_CLICKED(IDC_CHECK_MSG, &CMainDialog::OnBnClickedHookMainThreadMsg)
-ON_BN_CLICKED(IDC_BUTTON5, &CMainDialog::OnBnClickedButton5)
+ON_BN_CLICKED(IDC_BUTTON5, &CMainDialog::OnBnClickedTakeDrugs)
 ON_BN_CLICKED(IDC_BUTTON6, &CMainDialog::OnBnClickedFindWay)
 END_MESSAGE_MAP()
+
+BOOL CMainDialog::PreTranslateMessage(MSG* pMsg) {
+    // 检查是否是键盘按下事件
+    // if (pMsg->message == WM_KEYDOWN) {
+    //    // 检查是否是你想要的按键，比如 F1
+    //    if (pMsg->wParam == VK_F6)  // VK_F1 对应 F1 键
+    //    {
+    //        OnF6KeyDown();  // 调用你的函数
+    //        return TRUE;    // 消息已经处理
+    //    }
+    //    // 如果你想要检测组合键，比如 Ctrl+S
+    //    if (pMsg->wParam == 'S' && GetKeyState(VK_CONTROL) < 0)  // 'S' 是 S 键，VK_CONTROL 是 Ctrl 键
+    //    {
+    //        OnF6KeyDown();  // 调用你的函数
+    //        return TRUE;    // 消息已经处理
+    //    }
+    //}
+    return CDialogEx::PreTranslateMessage(pMsg);  // 调用父类的 PreTranslateMessage
+}
 
 
 // CMainDialog 消息处理程序
@@ -162,35 +191,6 @@ void CMainDialog::OnBnClickedSpeak() {
     Speak(content);
 }
 
-// npc阵营
-DWORD GetNpcGroup(DWORD npcStruct) {
-    // [[[0x14C2050+24]+8C]+1A84]
-    // 鼠标指针
-    DWORD*** baseAddress = (DWORD***)(0x14C2050 + 0x24);
-    DWORD mouseAddress = baseAddress[0][0x8C / 4][0x1A84 / 4];
-
-    DWORD npcIdLow = *(DWORD*)(npcStruct + 0x140);
-    DWORD npcIdHigh = *(DWORD*)(npcStruct + 0x144);
-
-    DWORD tmp = 0;
-    DWORD group = 0;
-
-    _asm {
-        push 0          ;  // 固定0 
-        lea  eax, tmp
-        push eax        ;  // 随意局部变量
-
-        push npcStruct  ;  // npc对象结构  +140是npcid
-        push npcIdHigh  ;  // 固定值 0x01000000
-        push npcIdLow   ;  // ipcid
-        mov  ecx, mouseAddress
-
-        mov  eax, 0x00741800
-        call eax
-        mov  group, eax;
-    }
-    return group;
-}
 
 void CMainDialog::OnBnClickedAroundNPC() {
     // [[[[[14C2050+24]+94]+4]+C]+74]
@@ -327,53 +327,8 @@ void CMainDialog::OnBnClickedAutoAttack() {
     }
 }
 
-LONG_PTR gamePreProc;
-LRESULT CALLBACK GameProc(
-    _In_ HWND hwnd,
-    _In_ UINT uMsg,
-    _In_ WPARAM wParam,
-    _In_ LPARAM lParam
-) {
-    switch (uMsg) {
-        case 0x400: {
-            LPCWSTR content = L"zzz";
-            Speak(content);
-            SetEvent((HANDLE)lParam);
-            break;
-        }
-        default:
-            break;
-    }
-    return ::CallWindowProcW((WNDPROC)gamePreProc, hwnd, uMsg, wParam, lParam);
-}
-
-
-HWND GetMainThreadHwnd() {
-    HWND windowHwnd = *(HWND*)(0x014C2000);
-    return windowHwnd;
-}
-
-
 void CMainDialog::OnBnClickedHookMainThreadMsg() {
-    HWND mainThreadHandle = GetMainThreadHwnd();
-    if (m_setMainThreadMsg.GetCheck()) {
-        gamePreProc = ::SetWindowLongPtrW(mainThreadHandle, GWLP_WNDPROC, (LONG_PTR)GameProc);
-        printf("Hook Main Thread Msg\n");
-    } else {
-        ::SetWindowLongPtrW(mainThreadHandle, GWLP_WNDPROC, (LONG_PTR)gamePreProc);
-    }
 }
-
-void CMainDialog::OnBnClickedButton5() {
-    HWND mainThreadHandle = GetMainThreadHwnd();
-    HANDLE eventHandle = CreateEvent(NULL, FALSE, FALSE, L"Event");
-    // ID > WM_USER(0X400)
-    ::PostMessage(mainThreadHandle, 0X400, 0, (LPARAM)eventHandle);
-    NOT_NULL(eventHandle);
-    WaitForSingleObject(eventHandle, 3000);
-    CloseHandle(eventHandle);
-}
-
 
 void CMainDialog::OnBnClickedFindWay() {
     typedef struct _CORRDINATES {
@@ -386,6 +341,7 @@ void CMainDialog::OnBnClickedFindWay() {
     coordinates.x = -150.0;
     coordinates.y = 50.0;
     coordinates.z = 0;
+    DWORD mapId = 0x44;
     _asm { 
         push 0
         push 1
@@ -402,7 +358,7 @@ void CMainDialog::OnBnClickedFindWay() {
         mov ecx, dword ptr ds:[eax+0x274]
 
         // 地图id
-        push 0x44 
+        push mapId 
         push 0
         push 0
         push 0
@@ -410,4 +366,7 @@ void CMainDialog::OnBnClickedFindWay() {
         mov eax, 0x730500
         call eax
     }
+}
+void CMainDialog::OnBnClickedTakeDrugs() {
+    SendMessageToWindow(0X400);
 }

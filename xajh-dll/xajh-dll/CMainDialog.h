@@ -12,7 +12,12 @@
 #include "attack-monster.h"
 #include "auto-attack.h"
 #include "Zydis/Zydis.h"
+#include "game-call.h"
+#include "hook-main-thread.h"
+#include "hot-key.h"
+
 // CMainDialog 对话框
+extern LONG_PTR gamePreProc;
 
 class CMainDialog : public CDialogEx {
     DECLARE_DYNAMIC(CMainDialog)
@@ -32,7 +37,15 @@ class CMainDialog : public CDialogEx {
 #endif
 
    protected:
-    virtual void DoDataExchange(CDataExchange* pDX);  // DDX/DDV 支持
+    // DDX/DDV 支持
+    virtual void DoDataExchange(CDataExchange* pDX);
+    afx_msg void OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2);
+
+    // 程序内快捷键 重载 PreTranslateMessage
+    virtual BOOL PreTranslateMessage(MSG* pMsg);
+
+    // 添加 OnDestroy 方法的声明
+    afx_msg void OnDestroy();
 
     DECLARE_MESSAGE_MAP()
    public:
@@ -45,6 +58,6 @@ class CMainDialog : public CDialogEx {
     afx_msg void OnBnClickedWxList();
     afx_msg void OnBnClickedAutoAttack();
     afx_msg void OnBnClickedHookMainThreadMsg();
-    afx_msg void OnBnClickedButton5();
+    afx_msg void OnBnClickedTakeDrugs();
     afx_msg void OnBnClickedFindWay();
 };

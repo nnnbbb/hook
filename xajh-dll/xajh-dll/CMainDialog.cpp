@@ -95,16 +95,6 @@ BOOL CMainDialog::PreTranslateMessage(MSG* pMsg) {
 
 
 // CMainDialog 消息处理程序
-std::string WStringToString(const std::wstring& wstr) {
-    // 计算所需的缓冲区大小
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), nullptr, 0, nullptr, nullptr);
-    std::string str(size_needed, 0);
-
-    // 执行转换
-    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.size()), &str[0], size_needed, nullptr, nullptr);
-
-    return str;
-}
 
 void GetGoodsName(DWORD GoodsId, wchar_t* utf16_str, int length) {
     DWORD Tmp = 0;

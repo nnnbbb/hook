@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <stdexcept>
 #include "game-call.h"
-#include "utils.hpp"
+#include "utils.h"
 
 void HookMainThread();
 

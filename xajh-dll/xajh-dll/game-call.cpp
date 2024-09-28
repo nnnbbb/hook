@@ -119,6 +119,20 @@ void ChoiceMonster() {
     }
     ChoiceObject(choiceId);
 }
+/*
+当前选中对象血量
+[[[[14C2050+24]+8]+0x324]+368]+290+1C
+[[[[14C2050+24]+8]+0x324]+368] 如果有值表示选中目标
+*/
+u32 GetChoiceMonsterHPRate() {
+    auto addr = (DWORD****)(0x14C2050 + 0x24);
+    auto choiceObject = addr[0][0x8 / 4][0x324 / 4][0x368 / 4];
+    if (choiceObject != 0) {
+        auto hp = *(u32*)(choiceObject + 0x290 + 0x1C);
+        return hp;
+    }
+    return -1;
+}
 
 void MouseSelected() {
     // [[[[[0x14C0BF0]+0x24]+0xC]+0x4]+0x40]
@@ -128,7 +142,53 @@ void MouseSelected() {
         printf("npcBaseAddr -> %x\n", npcBaseAddr);
         float x = *(float*)(npcBaseAddr + 0x3C);
         float y = *(float*)(npcBaseAddr + 0x44);
-        float hp = *(float*)(npcBaseAddr + 0x2AC);
-        printf("npc hp -> %f\n", hp);
+        u32 hpRate = GetChoiceMonsterHPRate();
+        printf("npc hp -> %d\n", hpRate);
     }
+}
+
+void AroundGoods() {
+    u32 goodsBeginAddr = 0;
+    u32 goodsArrLen = 0;
+    _asm {
+        mov eax, 0x004AEF90
+        call eax
+        mov eax, [eax+0x78]
+        lea edi, [eax+0x14]
+        // 数组起始地址
+        mov eax, [edi+0x8]
+        mov goodsBeginAddr, eax;
+        // 数组长度
+        mov eax, [edi + 0x14]
+        mov goodsArrLen, eax
+    }
+    CString str;
+
+    for (size_t i = 0; i < goodsArrLen; i++) {
+        u32 linkDataAddr = *(u32*)(goodsBeginAddr + i * 4);
+        if (linkDataAddr == 0) {
+            continue;
+        }
+        u32 linkData = 0;
+        do {
+            linkData = *(u32*)(linkDataAddr + 0);
+            u32 goodsDataAddr = *(u32*)(linkDataAddr + 4);
+            u64 goodsID = *(u64*)(goodsDataAddr + 0x140);
+
+            if (linkData != 0) {
+                linkDataAddr = *(u32*)(linkDataAddr + 0);
+            }
+            u32 idLow = static_cast<u32>(goodsID);         // 低 32 位
+            u32 idHigh = static_cast<u32>(goodsID >> 32);  // 高 32 位
+            u32 name = *(u32*)(goodsDataAddr + 0x4B4);
+            printf("goods idLow = 0x%X ", idLow);
+            printf("goods addr = 0x%X ", goodsDataAddr);
+            printf("name addr = 0x%X ", goodsDataAddr + 0x4B4);
+            str.Format(L"name = %s \r\n", (wchar_t*)(name + 0xE));
+            PrintCString(str);
+
+        } while (linkData);
+    }
+    printf("goodsBeginAddr -> 0x%x\n", goodsBeginAddr);
+    printf("goodsArrLen -> 0x%x\n", goodsArrLen);
 }

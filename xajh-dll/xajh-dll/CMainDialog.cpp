@@ -71,6 +71,7 @@ ON_BN_CLICKED(IDC_CHECK1, &CMainDialog::OnBnClickedAutoAttack)
 ON_BN_CLICKED(IDC_CHECK_MSG, &CMainDialog::OnBnClickedHookMainThreadMsg)
 ON_BN_CLICKED(IDC_BUTTON5, &CMainDialog::OnBnClickedTakeDrugs)
 ON_BN_CLICKED(IDC_BUTTON6, &CMainDialog::OnBnClickedFindWay)
+ON_BN_CLICKED(IDC_BUTTON7, &CMainDialog::OnBnClickedAroundGoods)
 END_MESSAGE_MAP()
 
 BOOL CMainDialog::PreTranslateMessage(MSG* pMsg) {
@@ -145,14 +146,6 @@ void GetConsoleCodePage() {
     std::cout << "Console Output Code Page: " << codePage << std::endl;
 }
 
-void PrintCString(const CString& cstr) {
-    // 将 CString 转换为多字节字符集 LPCSTR
-    CStringA strA(cstr);
-    LPCSTR str = strA;
-
-    // 使用 printf 输出字符串
-    printf("%s", str);
-}
 
 void CMainDialog::OnBnClickedBagList() {
     int length = 20;
@@ -210,9 +203,9 @@ void CMainDialog::OnBnClickedAroundNPC() {
 
         DWORD npcId = *(DWORD*)(npcRealStruct + 0x140);
         // 获取虚函数表
-        DWORD virtua1FunTable = ((DWORD*)npcRealStruct)[0];
+        DWORD virtualFunTable = ((DWORD*)npcRealStruct)[0];
         // 获取对象函数地址
-        DWORD getNameFunc = *(DWORD*)(virtua1FunTable + 0x88);
+        DWORD getNameFunc = *(DWORD*)(virtualFunTable + 0x88);
         const wchar_t* npcName = L"";
         // LPWSTR npcName = const_cast<LPWSTR>(L"");
         _asm {
@@ -226,7 +219,7 @@ void CMainDialog::OnBnClickedAroundNPC() {
         if (group == 9) {
             m_content.Append(L"可攻击对象");
         }
-        str.Format(L"NPCID为: %d(%X) Name: %s\r\n", npcId, npcId, npcName);
+        str.Format(L"addr = 0x%X NPCID为: %d(%X) Name: %s\r\n", npcRealStruct, npcId, npcId, npcName);
         m_content.Append(str);
         // PrintCString(str);
     }
@@ -369,4 +362,9 @@ void CMainDialog::OnBnClickedFindWay() {
 }
 void CMainDialog::OnBnClickedTakeDrugs() {
     SendMessageToWindow(0X400);
+}
+
+
+void CMainDialog::OnBnClickedAroundGoods() {
+    AroundGoods();
 }

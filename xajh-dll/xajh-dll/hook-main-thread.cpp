@@ -40,7 +40,12 @@ void SendMessageToWindow(_In_ UINT MsgCode) {
 
 void HookMainThread() {
     printf("Hook Main Thread Msg\n");
-    gamePreProc = ::SetWindowLongPtrW(mainThreadHandle, GWLP_WNDPROC, (LONG_PTR)GameProc);
+
+    gamePreProc = ::SetWindowLongPtrW(
+        mainThreadHandle,
+        GWLP_WNDPROC,
+        (LONG_PTR)GameProc
+    );
 }
 void UnHookMainThread() {
     ::SetWindowLongPtrW(mainThreadHandle, GWLP_WNDPROC, (LONG_PTR)gamePreProc);

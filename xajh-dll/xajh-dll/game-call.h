@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "utils.hpp"
 
 typedef struct _ROLE_INFORMATION {
     float x;
@@ -17,6 +17,8 @@ ROLE_INFORMATION GetRoleInformation();
 void ChoiceMonster();
 
 void MouseSelected();
+
+void AroundGoods();
 
 class GameCall {
 };

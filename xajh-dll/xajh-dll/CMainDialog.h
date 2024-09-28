@@ -60,4 +60,5 @@ class CMainDialog : public CDialogEx {
     afx_msg void OnBnClickedHookMainThreadMsg();
     afx_msg void OnBnClickedTakeDrugs();
     afx_msg void OnBnClickedFindWay();
+    afx_msg void OnBnClickedAroundGoods();
 };

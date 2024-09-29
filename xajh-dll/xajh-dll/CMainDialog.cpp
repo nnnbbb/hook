@@ -5,6 +5,7 @@
 #include "resource.h"
 #include "CMainDialog.h"
 #include "afxdialogex.h"
+#include "log.hpp"
 
 // CMainDialog 对话框
 IMPLEMENT_DYNAMIC(CMainDialog, CDialogEx)
@@ -17,6 +18,7 @@ CMainDialog::~CMainDialog() {
 }
 
 BOOL CMainDialog::OnInitDialog() {
+    log("init");
     CDialogEx::OnInitDialog();
     // MakeWindowTopMost();
     // 设置窗口的位置和大小

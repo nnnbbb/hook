@@ -10,12 +10,21 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef std::string String;
 typedef std::wstring WString;
+template <typename T>
+using Vector = std::vector<T>;
 
+String Utf16ToLocalCP(const WString& wstr);
+String Utf16ToLocalCP(const wchar_t* wstr);
+
+String LocalCPToUtf8(const String& str);
+String LocalCPToUtf8(const char* str);
 
 String Utf16ToUtf8(const WString& wstr);
 String Utf16ToUtf8(const wchar_t* wstr);
+
 WString Utf8ToUtf16(const String& str);
 WString Utf8ToUtf16(const char* str);
+
 
 #define FN_ADDRESS(func) \
     std::cout << "Function address of " #func ": " << "0x" << (void*)func << std::endl;

@@ -1,7 +1,8 @@
 ﻿#include "pch.h"
 #include "game-call.h"
-#include "log.hpp"
 #include "utils.h"
+#include "log.hpp"
+
 
 void Speak(LPCWSTR content) {
     _asm {
@@ -266,16 +267,15 @@ void GetTaskList() {
     }
     u32 taskStart = taskList[1];
     u32 taskEnd = taskList[2];
-    printf("TaskStart -> 0x%x\n", taskStart);
-    printf("TaskEnd -> 0x%x\n", taskEnd);
+    log("TaskStart ->", hex(taskStart));
+    log("TaskEnd ->", hex(taskEnd));
     CString str;
 
     while (taskStart < taskEnd) {
         u32 taskAddress = *(u32*)taskStart;
         u32 taskName = taskAddress + 8;
         u32 id = *(u32*)(taskAddress + 4);
-        printf("Task id -> 0x%x ", id);
-        PrintWChar(taskName);
+        log("Task ->", hex(taskAddress), hex(id), (wchar_t*)taskName);
         taskStart += 4;
     }
     // CustomFree((void*)taskStart);

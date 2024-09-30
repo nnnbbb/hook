@@ -23,6 +23,7 @@ other/
 bld/
 [Bb]in/
 [Oo]bj/
+[Oo]bjs/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -245,3 +246,4 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Hook-Notes/Notes/xajh/objs

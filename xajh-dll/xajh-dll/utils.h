@@ -1,6 +1,18 @@
 ﻿#include <string>
 #include <vector>
 #include <Windows.h>
+#include <iostream>
+#include <fstream>
+#include <cstdarg>
+#include <chrono>
+#include <ctime>
+#include <locale>
+#include <codecvt>
+#include <iomanip>
+#include <sstream>
+#include <thread>
+#include <filesystem>
+#include <algorithm>
 
 #ifndef _UTILS
 #define _UTILS

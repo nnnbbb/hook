@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.33801.447
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xajh-dll", "xajh-dll\xajh-dll.vcxproj", "{CAA3E0D7-F5BD-4EC3-8BB8-E4E17F45493E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xajh", "xajh-dll\xajh-dll.vcxproj", "{CAA3E0D7-F5BD-4EC3-8BB8-E4E17F45493E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "injector", "injector\injector.vcxproj", "{ABA4C857-F5BF-463D-AE16-74B1CD7D751C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scanByteCode", "scanByteCode\scanByteCode.vcxproj", "{299C3497-5CEB-40BE-A946-D590FF67C21D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{ABA4C857-F5BF-463D-AE16-74B1CD7D751C}.Release|x64.Build.0 = Release|x64
 		{ABA4C857-F5BF-463D-AE16-74B1CD7D751C}.Release|x86.ActiveCfg = Release|Win32
 		{ABA4C857-F5BF-463D-AE16-74B1CD7D751C}.Release|x86.Build.0 = Release|Win32
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Debug|x64.ActiveCfg = Debug|x64
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Debug|x64.Build.0 = Debug|x64
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Debug|x86.ActiveCfg = Debug|Win32
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Debug|x86.Build.0 = Debug|Win32
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Release|x64.ActiveCfg = Release|x64
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Release|x64.Build.0 = Release|x64
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Release|x86.ActiveCfg = Release|Win32
+		{299C3497-5CEB-40BE-A946-D590FF67C21D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

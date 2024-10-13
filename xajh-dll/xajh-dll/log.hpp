@@ -1,18 +1,4 @@
 ﻿#include "pch.h"
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <cstdarg>
-#include <chrono>
-#include <ctime>
-#include <locale>
-#include <codecvt>
-#include <iomanip>
-#include <sstream>
-#include <vector>
-#include <thread>
-#include <filesystem>
-#include <algorithm>
 #include "utils.h"
 
 #ifndef _LOG
@@ -20,6 +6,26 @@
 
 namespace fs = std::filesystem;
 
+enum class PrintType {
+    Wchar,
+    ConstWchar,
+    Other
+};
+
+template <typename T, typename = void>
+struct type_traits {
+    static const PrintType type = PrintType::Other;
+};
+
+template <>
+struct type_traits<wchar_t*> {
+    static const PrintType type = PrintType::Wchar;
+};
+
+template <>
+struct type_traits<const wchar_t*> {
+    static const PrintType type = PrintType::ConstWchar;
+};
 
 template <class T, class F>
 decltype(auto) map(const Vector<T> a, const F fn) {
@@ -50,24 +56,15 @@ inline String hex(T number, size_t prefix = 4) {
 
 template <class T>
 inline String _print(T arg) {
+    if constexpr (type_traits<T>::type == PrintType::Wchar || type_traits<T>::type == PrintType::ConstWchar) {
+        std::cout << Utf16ToLocalCP(arg) << " ";
+        return Utf16ToUtf8(arg) + " ";
+    }
     std::cout << arg << " ";
     std::ostringstream oss;
     oss << arg;
     return LocalCPToUtf8(oss.str()) + " ";
 }
-
-template <>
-inline String _print(wchar_t* arg) {
-    std::cout << Utf16ToLocalCP(arg) << " ";
-    return Utf16ToUtf8(arg);
-}
-
-template <>
-inline String _print(const wchar_t* arg) {
-    std::cout << Utf16ToLocalCP(arg) << " ";
-    return Utf16ToUtf8(arg);
-}
-
 
 inline void writeToFile(const String& path, const Vector<String>& logs) {
     std::ofstream f(path, std::ios_base::app | std::ios::out);

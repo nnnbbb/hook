@@ -1,15 +1,14 @@
-地址里面是一个地址
+地址里面是unicode编码的二进制值
 ```
 utf-16 就是 wchar_t 类型
 一个字占两个字节 就是4个十六进制数字
 
 LE（Little Endian）：小端序，低位字节在前。
-BE（Big Endian）：大端序，高位字节在前。
-
 UTF-16 Little Endian (LE)：
 "你"：0x60 0x4F
 "好"：0x7D 0x59
 
+BE（Big Endian）：大端序，高位字节在前。
 UTF-16 Big Endian (BE)：
 "你"：0x4F 0x60
 "好"：0x59 0x7D

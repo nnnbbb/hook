@@ -190,3 +190,7 @@ C:\Users\nnn\AppData\Local\vcpkg
   <TargetExt>.dp64</TargetExt>
   <OutDir>$(SolutionDir)bin\x64d\</OutDir>
 </PropertyGroup>
+
+
+#### 添加 include 目录
+    <IncludePath> $(SolutionDir)\$(ProjectName)\include;$(IncludePath) </IncludePath>

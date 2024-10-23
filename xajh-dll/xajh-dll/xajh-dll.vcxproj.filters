@@ -25,20 +25,17 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files\sdk">
-      <UniqueIdentifier>{e4e6a76b-b463-4675-93eb-ad7e082bf7c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\sdk\Zydis">
-      <UniqueIdentifier>{a8b40531-5d5f-4ec4-bcbe-d498d6daa351}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\sdk\Zydis\Generated">
-      <UniqueIdentifier>{68f48dca-1bf6-45b3-ae14-8ee028a6dd14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\sdk\Zydis\Internal">
-      <UniqueIdentifier>{45f4d692-3a4a-4177-ba12-fd72ad0e3b87}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{1aaba1e9-84bb-4dd4-be58-3bcc2366dc26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Zydis">
+      <UniqueIdentifier>{a8b40531-5d5f-4ec4-bcbe-d498d6daa351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Zydis\Generated">
+      <UniqueIdentifier>{acdaf5d5-9e44-4287-a775-010b38e09bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Zydis\Internal">
+      <UniqueIdentifier>{29aed136-d859-4bb2-8472-e57e5522168d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -109,90 +106,6 @@
     <ClInclude Include="game-call.h">
       <Filter>Game\Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sdk\Zydis\Decoder.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\DecoderTypes.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Defines.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Disassembler.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Encoder.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Formatter.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\FormatterBuffer.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\MetaInfo.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Mnemonic.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Register.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Segment.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\SharedTypes.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\ShortString.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Status.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Utils.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Zydis.h">
-      <Filter>Header Files\sdk\Zydis</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Generated\EnumInstructionCategory.h">
-      <Filter>Header Files\sdk\Zydis\Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Generated\EnumISAExt.h">
-      <Filter>Header Files\sdk\Zydis\Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Generated\EnumISASet.h">
-      <Filter>Header Files\sdk\Zydis\Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Generated\EnumMnemonic.h">
-      <Filter>Header Files\sdk\Zydis\Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Generated\EnumRegister.h">
-      <Filter>Header Files\sdk\Zydis\Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\DecoderData.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\EncoderData.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\FormatterATT.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\FormatterBase.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\FormatterIntel.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\SharedData.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
-    <ClInclude Include="sdk\Zydis\Internal\String.h">
-      <Filter>Header Files\sdk\Zydis\Internal</Filter>
-    </ClInclude>
     <ClInclude Include="hook-main-thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -202,6 +115,90 @@
     <ClInclude Include="utils.h">
       <Filter>Source Files\utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Zydis\Decoder.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\DecoderTypes.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Defines.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Disassembler.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Encoder.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Formatter.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\FormatterBuffer.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\MetaInfo.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Mnemonic.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Register.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Segment.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\SharedTypes.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\ShortString.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Status.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Utils.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Zydis.h">
+      <Filter>Header Files\Zydis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Generated\EnumInstructionCategory.h">
+      <Filter>Header Files\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Generated\EnumISAExt.h">
+      <Filter>Header Files\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Generated\EnumISASet.h">
+      <Filter>Header Files\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Generated\EnumMnemonic.h">
+      <Filter>Header Files\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Generated\EnumRegister.h">
+      <Filter>Header Files\Zydis\Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\DecoderData.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\EncoderData.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\FormatterATT.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\FormatterBase.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\FormatterIntel.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\SharedData.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zydis\Internal\String.h">
+      <Filter>Header Files\Zydis\Internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xajh-dll.rc">
@@ -209,10 +206,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="sdk\Zydis\Zydis_x64.lib">
+    <Library Include="lib\Zydis_x64.lib">
       <Filter>Library Files</Filter>
     </Library>
-    <Library Include="sdk\Zydis\Zydis_x86.lib">
+    <Library Include="lib\Zydis_x86.lib">
       <Filter>Library Files</Filter>
     </Library>
   </ItemGroup>

@@ -56,7 +56,8 @@ inline String hex(T number, size_t prefix = 4) {
 
 template <class T>
 inline String _print(T arg) {
-    if constexpr (type_traits<T>::type == PrintType::Wchar || type_traits<T>::type == PrintType::ConstWchar) {
+    if constexpr (type_traits<T>::type == PrintType::Wchar ||
+                  type_traits<T>::type == PrintType::ConstWchar) {
         std::cout << Utf16ToLocalCP(arg) << " ";
         return Utf16ToUtf8(arg) + " ";
     }

@@ -121,6 +121,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -154,6 +155,7 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,6 +191,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -226,6 +229,7 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -282,48 +286,48 @@
     <ClInclude Include="game-call.h" />
     <ClInclude Include="hook-main-thread.h" />
     <ClInclude Include="hot-key.h" />
+    <ClInclude Include="include\Zydis\Decoder.h" />
+    <ClInclude Include="include\Zydis\DecoderTypes.h" />
+    <ClInclude Include="include\Zydis\Defines.h" />
+    <ClInclude Include="include\Zydis\Disassembler.h" />
+    <ClInclude Include="include\Zydis\Encoder.h" />
+    <ClInclude Include="include\Zydis\Formatter.h" />
+    <ClInclude Include="include\Zydis\FormatterBuffer.h" />
+    <ClInclude Include="include\Zydis\Generated\EnumInstructionCategory.h" />
+    <ClInclude Include="include\Zydis\Generated\EnumISAExt.h" />
+    <ClInclude Include="include\Zydis\Generated\EnumISASet.h" />
+    <ClInclude Include="include\Zydis\Generated\EnumMnemonic.h" />
+    <ClInclude Include="include\Zydis\Generated\EnumRegister.h" />
+    <ClInclude Include="include\Zydis\Internal\DecoderData.h" />
+    <ClInclude Include="include\Zydis\Internal\EncoderData.h" />
+    <ClInclude Include="include\Zydis\Internal\FormatterATT.h" />
+    <ClInclude Include="include\Zydis\Internal\FormatterBase.h" />
+    <ClInclude Include="include\Zydis\Internal\FormatterIntel.h" />
+    <ClInclude Include="include\Zydis\Internal\SharedData.h" />
+    <ClInclude Include="include\Zydis\Internal\String.h" />
+    <ClInclude Include="include\Zydis\MetaInfo.h" />
+    <ClInclude Include="include\Zydis\Mnemonic.h" />
+    <ClInclude Include="include\Zydis\Register.h" />
+    <ClInclude Include="include\Zydis\Segment.h" />
+    <ClInclude Include="include\Zydis\SharedTypes.h" />
+    <ClInclude Include="include\Zydis\ShortString.h" />
+    <ClInclude Include="include\Zydis\Status.h" />
+    <ClInclude Include="include\Zydis\Utils.h" />
+    <ClInclude Include="include\Zydis\Zydis.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="sdk\Zydis\Decoder.h" />
-    <ClInclude Include="sdk\Zydis\DecoderTypes.h" />
-    <ClInclude Include="sdk\Zydis\Defines.h" />
-    <ClInclude Include="sdk\Zydis\Disassembler.h" />
-    <ClInclude Include="sdk\Zydis\Encoder.h" />
-    <ClInclude Include="sdk\Zydis\Formatter.h" />
-    <ClInclude Include="sdk\Zydis\FormatterBuffer.h" />
-    <ClInclude Include="sdk\Zydis\Generated\EnumInstructionCategory.h" />
-    <ClInclude Include="sdk\Zydis\Generated\EnumISAExt.h" />
-    <ClInclude Include="sdk\Zydis\Generated\EnumISASet.h" />
-    <ClInclude Include="sdk\Zydis\Generated\EnumMnemonic.h" />
-    <ClInclude Include="sdk\Zydis\Generated\EnumRegister.h" />
-    <ClInclude Include="sdk\Zydis\Internal\DecoderData.h" />
-    <ClInclude Include="sdk\Zydis\Internal\EncoderData.h" />
-    <ClInclude Include="sdk\Zydis\Internal\FormatterATT.h" />
-    <ClInclude Include="sdk\Zydis\Internal\FormatterBase.h" />
-    <ClInclude Include="sdk\Zydis\Internal\FormatterIntel.h" />
-    <ClInclude Include="sdk\Zydis\Internal\SharedData.h" />
-    <ClInclude Include="sdk\Zydis\Internal\String.h" />
-    <ClInclude Include="sdk\Zydis\MetaInfo.h" />
-    <ClInclude Include="sdk\Zydis\Mnemonic.h" />
-    <ClInclude Include="sdk\Zydis\Register.h" />
-    <ClInclude Include="sdk\Zydis\Segment.h" />
-    <ClInclude Include="sdk\Zydis\SharedTypes.h" />
-    <ClInclude Include="sdk\Zydis\ShortString.h" />
-    <ClInclude Include="sdk\Zydis\Status.h" />
-    <ClInclude Include="sdk\Zydis\Utils.h" />
-    <ClInclude Include="sdk\Zydis\Zydis.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="xajh-dll.h" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="sdk\Zydis\Zydis_x64.lib">
+    <Library Include="lib\Zydis_x64.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </Library>
-    <Library Include="sdk\Zydis\Zydis_x86.lib">
+    <Library Include="lib\Zydis_x86.lib">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

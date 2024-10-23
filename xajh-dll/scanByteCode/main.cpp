@@ -3,6 +3,10 @@
 #include <iostream>
 #include <tlhelp32.h>
 #include <processsnapshot.h>
+#include <fstream>
+#include <sstream>
+#include "json/json.h"
+#include "log.hpp"
 
 DWORD GetPidByName(const WCHAR* name) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -77,16 +81,43 @@ BOOL ScanGameCode(
     return TRUE;
 }
 
+Json::Value readJsonFile(const String& filename) {
+    std::ifstream file;
+    file.open(filename);
 
-int main() {
+    Json::CharReaderBuilder ReaderBuilder;
+    ReaderBuilder["emitUTF8"] = true;
+
+    Json::Value root;
+
+    String strerr;
+    bool ok = Json::parseFromStream(ReaderBuilder, file, &root, &strerr);
+    if (!ok) {
+        std::cerr << "json解析错误";
+    }
+    return root;
+}
+
+int update() {
     DWORD pid = GetPidByName(L"xajh.exe");
     printf("pid -> %d\n", pid);
-    std::string code = "C6 84 24 CC 00 00 00 05 E8 52 42 18 00";
-    removeSpaces(code);
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, (DWORD)pid);
     DWORD addr = 0;
-    ScanGameCode(hProcess, 0x00AA94FF, 0x00BA9600, (char*)code.c_str(), code.size(), addr);
-    printf("addr -> 0x%X\n", addr);
+
+    Json::Value root = readJsonFile("./code.json");
+    for (const auto& item : root) {
+        String code = item["code"].asString();
+        String comment = item["comment"].asString();
+        int offset = item["offset"].asInt();
+        removeSpaces(code);
+        ScanGameCode(hProcess, 0x00AA94FF, 0x00BA9600, (char*)code.c_str(), code.size(), addr);
+        log(comment, hex(addr), "offset = ", offset);
+    }
+    return 0;
+}
+
+int main() {
+    update();
     system("pause");
     return 0;
 }

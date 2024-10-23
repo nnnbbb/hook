@@ -1,0 +1,8 @@
+[
+  {
+    "code": "C6 84 24 CC 00 00 00 05 E8 52 42 18 00",
+    "operator": "+",
+    "offset": 11,
+    "comment": "task list call"
+  }
+]

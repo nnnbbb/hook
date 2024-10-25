@@ -144,6 +144,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="kmp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="string.utils.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="include\json\value.h" />
     <ClInclude Include="include\json\version.h" />
     <ClInclude Include="include\json\writer.h" />
+    <ClInclude Include="kmp.h" />
     <ClInclude Include="log.hpp" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

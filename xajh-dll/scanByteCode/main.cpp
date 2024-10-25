@@ -7,6 +7,7 @@
 #include <sstream>
 #include "json/json.h"
 #include "log.hpp"
+#include "kmp.h"
 
 DWORD GetPidByName(const WCHAR* name) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -71,7 +72,8 @@ BOOL ScanGameCode(
         }
         ByteToChar(readCode, strCode, size);
         for (size_t i = 0; i < size * 2 + 1 - codeLen; i++) {
-            BOOL retCmp = CmpStrCode(code, &strCode[i], codeLen);
+            // BOOL retCmp = CmpStrCode(code, &strCode[i], codeLen);
+            BOOL retCmp = kmpSearch(&strCode[i], code);
             if (retCmp == TRUE) {
                 retAddr = readAddr + i / 2;
                 printf("起始地址为:0x%X\n", retAddr);
